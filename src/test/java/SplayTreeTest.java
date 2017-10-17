@@ -14,25 +14,8 @@ public class SplayTreeTest{
         root.find(22);// +6
         root = (SplayTree) root.getRootForFree();
         assertEquals(12, root.getCount());
+        assertEquals(true, root.isValidBST());
         
-    }
-    @Test public void largeSplayTree(){
-        testSplayTree(1000, 2000);
-        testSplayTree(1000, 4000);
-        testSplayTree(10000, 20000);
-    }
-    private void testSplayTree(int treeSize, int accesses){
-        BstCounter bstCounter = new BstCounter();
-        SplayTree node = new SplayTree(0, bstCounter);
-        long startTime = System.nanoTime();
-        for (int i = treeSize; i > 0; i--){
-            node.getRootForFree().insert(i);
-        }
-        for (int i = 0; i<accesses; i++){
-            node.getRootForFree().find(i % treeSize);
-        }
-        long endTime = System.nanoTime();
-        System.out.printf("%9d accesses on a %9d node tree = %12d ops. Time=%f\n", accesses, treeSize, bstCounter.getCount(), (endTime-startTime)/1e9);
     }
     private SplayTree makeTestTree(){
         BstCounter bstCounter = new BstCounter();

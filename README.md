@@ -12,6 +12,9 @@ As long as you put stuff in the right places, it gets compiled and tested.
 
 Run `./gradlew test` to test.
 
+Run `/gradlew run` to run it.  It currently does 3 tests for how many operations it takes a 
+large splay tree to find all the keys in a large list of keys.
+
 There is now a Gradle eclipse plugin.  http://www.vogella.com/tutorials/EclipseGradle/article.html
 
 ### For future reference
