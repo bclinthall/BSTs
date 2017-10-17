@@ -5,10 +5,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AppTest {
-    @Test public void testAppHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
-    }
     @Test public void testNodeReadout(){
         Node seven = new Node(7);
         seven.setLeft(new Node(4));
