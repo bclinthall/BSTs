@@ -1,12 +1,22 @@
+import java.util.List;
+import java.util.ArrayList;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.io.IOException;
+
 class Node{
     private static Node nullNode = new Node(0);
     private Node parent = nullNode;
     private Node left = nullNode;
     private Node right = nullNode;
-    private final int value;
+    private int id;
+    private static int nodeCount = 0;
+    protected final int value;
 
     public Node(int value){
         this.value = value;
+        this.id = nodeCount;
+        nodeCount++;
     }
     public void detach(){
         if (parent.left == this){
@@ -15,6 +25,9 @@ class Node{
             parent.right = nullNode;
         }
         this.parent = nullNode;
+    }
+    public Node getParent(){
+        return parent;
     }
     public Node getLeft(){
         return left;
@@ -40,6 +53,20 @@ class Node{
         this.right = nullNode;
         return tmp;
     }
+    public boolean isRoot(){
+        return parent == nullNode;
+    }
+    public boolean parentIsRoot(){
+        return parent.isRoot();
+    }
+    public boolean isInLine(){
+        if(isRoot() || parentIsRoot()){
+            throw new UnsupportedOperationException("It doesn't make sense to "
+                        + "call 'isInLine' on the root or a child of the root.");
+        }
+        return parent.parent.left == parent && parent.left == this
+            || parent.parent.right == parent && parent.right == this;
+    }
     public void insert(int toInsert){
         insert(new Node(toInsert));
     }
@@ -59,21 +86,20 @@ class Node{
         }
     }
     public void rotateUp(){
-        if (parent == nullNode){
+        if (isRoot()){
             System.err.println("Cannot rotate root with its parent");
             return;
         }
         Node oldGrandParent = parent.parent;
-        parent.detach();
         Node oldParent = parent;
-        detach();
-        Node oldChild;
+        Node oldChild = null;
         if (this == parent.right){
             oldChild = detachLeft();
-            
         } else {
             oldChild = detachRight();
         }
+        parent.detach();
+        detach();
         // I give my child to my parent.
         // My parent becomes my child.
         // I become the child of my grandparent
@@ -81,6 +107,23 @@ class Node{
         this.insert(oldParent);
         if (oldGrandParent != nullNode){
             oldGrandParent.insert(this);
+        }
+    }
+    public void rotateParentUp(){
+        if (isRoot()){
+            throw new UnsupportedOperationException("It doesn't make sense to rotate the root up");
+        }
+        parent.rotateUp();
+    }
+    public Node[] find(int key){
+        if(key < value && left != nullNode){
+            return getLeft().find(key);
+        }else if (key > value && right != nullNode){
+            return getRight().find(key);
+        }else if (value == key){
+            return new Node[]{this, this};
+        }else{
+            return new Node[]{null, this};
         }
     }
     public boolean isValidBST(){
@@ -103,11 +146,11 @@ class Node{
         }
         return isValid;
     }
-    public Node getRoot(){
+    public Node getRootForFree(){
         if (parent == nullNode){
             return this;
         }else{
-            return parent.getRoot();
+            return parent.getRootForFree();
         }
     }
     @Override
@@ -118,6 +161,46 @@ class Node{
             return value + "";
         }else{
             return value + ":{"+left + ", " + right + "}";
+        }
+    }
+    public void getGraphLines(List<String> graphLines){
+        graphLines.add("\t\"" + id + "\" [label=\"" + value + "\"];");
+        if (this.left != nullNode){
+            graphLines.add("\t\"" + id + "\" -> \"" + this.left.id + "\";");
+            this.left.getGraphLines(graphLines);
+        } else {
+            graphLines.add("\t\"" + id + "\" -> \"" + id + ".l\" [style=\"invis\"];");
+            graphLines.add("\t\"" + id + ".l\" [style=\"invis\"];");
+        }
+        //graphLines.add("\t\"" + id + "\" -> \"" + id + ".c\" [style=\"invis\"];");
+        //graphLines.add("\t\"" + id + ".c\" [style=\"invis\"];");
+        if (this.right != nullNode){
+            graphLines.add("\t\"" + id + "\" -> \"" + this.right.id + "\";");
+            this.right.getGraphLines(graphLines);
+        }else {
+            graphLines.add("\t\"" + id + "\" -> \"" + id + ".r\" [style=\"invis\"];");
+            graphLines.add("\t\"" + id + ".r\" [style=\"invis\"];");
+        }
+    }
+    public void graph(String name){
+        String outputType = "ps";
+        List<String> graphLines = new ArrayList<>();
+        graphLines.add("digraph G {");
+        graphLines.add("\tnode [shape=circle];");
+        getGraphLines(graphLines);
+        graphLines.add("}");
+        String graphName = "graphs/" + name;
+        String path = graphName +  ".gv";
+        try{
+            Files.write(Paths.get(path), graphLines);
+            String graphPath = graphName + "." + outputType;
+            Runtime.getRuntime().exec("dot -T" + outputType + " "
+                          + path + " -o " + graphPath).waitFor();
+            Runtime.getRuntime().exec("xdg-open " + graphPath).waitFor();
+        }catch(IOException e){
+            e.printStackTrace();
+        }catch(InterruptedException e){
+            e.printStackTrace();
         }
     }
 }

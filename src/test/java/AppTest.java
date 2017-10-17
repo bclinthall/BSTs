@@ -47,6 +47,8 @@ public class AppTest {
         seven.getRight().rotateUp();
         System.out.println(two);
         assertTrue(two.isValidBST());
+        String expected = "2:{, 10:{7:{4:{3, }, 8}, 22}}";
+        assertEquals(two.toString(), expected);
     }
 
     private Node makeTestTree(){
@@ -58,4 +60,5 @@ public class AppTest {
         seven.insert(22);
         return seven;
     }
+
 }
