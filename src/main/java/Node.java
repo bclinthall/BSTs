@@ -169,18 +169,19 @@ class Node{
             graphLines.add("\t\"" + id + "\" -> \"" + this.left.id + "\";");
             this.left.getGraphLines(graphLines);
         } else {
-            graphLines.add("\t\"" + id + "\" -> \"" + id + ".l\" [style=\"invis\"];");
-            graphLines.add("\t\"" + id + ".l\" [style=\"invis\"];");
+            addNonNode(graphLines, "l");
         }
-        //graphLines.add("\t\"" + id + "\" -> \"" + id + ".c\" [style=\"invis\"];");
-        //graphLines.add("\t\"" + id + ".c\" [style=\"invis\"];");
+        //addNoneNode(graphLines, "c");
         if (this.right != nullNode){
             graphLines.add("\t\"" + id + "\" -> \"" + this.right.id + "\";");
             this.right.getGraphLines(graphLines);
         }else {
-            graphLines.add("\t\"" + id + "\" -> \"" + id + ".r\" [style=\"invis\"];");
-            graphLines.add("\t\"" + id + ".r\" [style=\"invis\"];");
+            addNonNode(graphLines, "r");
         }
+    }
+    private void addNonNode(List<String> graphLines, String ident){
+        graphLines.add("\t\"" + id + "\" -> \"" + id + ident + "\" [color=gray95];");
+        graphLines.add("\t\"" + id + ident + "\" [shape=point, color=gray95];");
     }
     public void graph(String name){
         String outputType = "ps";
