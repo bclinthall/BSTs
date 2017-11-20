@@ -9,7 +9,7 @@ class TangoTree extends CounterNode {
     }
 
     @Override
-    Node[] find(int key){
+    public Node find(int key){
         // TODO
         /*
         if found, return [Node, null].
@@ -24,3 +24,5 @@ class TangoTree extends CounterNode {
     
     
 }
+/* Two splits and a concatenate simulate a cut.
+*/

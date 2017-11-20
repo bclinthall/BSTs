@@ -4,18 +4,23 @@ public class SplayTree extends CounterNode{
     }
     @Override
     public void insert(int toInsert){
-        insert(new SplayTree(toInsert, bstCounter));
+        SplayTree node = new SplayTree(toInsert, bstCounter);
+        super.insert(node);
+        splayToRoot(node);
     }
     @Override
-    public Node[] find(int key){
-        Node[] foundPair = super.find(key);
-        if (foundPair[0] != null){
-            Node found = foundPair[0];
-            while (!found.isRoot()){
-                splay(found);
-            }
+    public Node find(int key){
+        Node found = super.find(key);
+        if (found != nullNode){
+            splayToRoot(found);
         }
-        return foundPair;
+        return found;
+    }
+
+    public void splayToRoot(Node node){
+        while (!node.isRoot()){
+            splay(node);
+        }
     }
     public void splay(Node node){
         if (node.isRoot()){
@@ -29,5 +34,24 @@ public class SplayTree extends CounterNode{
             node.rotateUp();
             node.rotateUp();
         }
+    }
+    public Node[] split(int k){
+        Node node = find(k);
+        splayToRoot(node);
+        Node[] pair = {node, node.getRight()};
+        node.setRight(nullNode);
+        return pair;
+    }
+    public Node join(SplayTree a, SplayTree b){
+        Node max1 = a;
+        while (max1.getRight() != nullNode){
+            max1 = max1.getRight();
+        }
+        Node min2 = b;
+        splayToRoot(max1);
+        assert (max1.getRight() == nullNode);
+        assert(max1.getValue() > b.getValue());
+        max1.setRight(b);
+        return max1;
     }
 }
