@@ -1,4 +1,4 @@
-class AuxiliaryTree extends SplayTree{
+class AuxiliaryTree {
     int depth;
     int minSubtreeDepth;
     int maxSubtreeDepth;
