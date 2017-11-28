@@ -2,6 +2,17 @@ public class SplayTree extends CounterNode{
     public SplayTree(int value, BstCounter bstCounter){
         super(value, bstCounter);
     }
+    public SplayTree(BST node, BstCounter bstCounter){
+        super(node.getValue(), bstCounter);
+       	if (node.getLeft() != nullNode){
+			setLeft(new SplayTree(node.getLeft(), bstCounter));
+       	}
+       	if (node.getRight() != nullNode){
+           	setRight(new SplayTree(node.getRight(), bstCounter));
+       	}
+    }
+	
+    
     @Override
     public void insert(int toInsert){
         SplayTree node = new SplayTree(toInsert, bstCounter);
@@ -9,45 +20,49 @@ public class SplayTree extends CounterNode{
         splayToRoot(node);
     }
     @Override
-    public Node find(int key){
-        Node found = super.find(key);
+    public BST find(int key){
+        BST found = super.find(key);
         if (found != nullNode){
             splayToRoot(found);
         }
         return found;
     }
 
-    public void splayToRoot(Node node){
-        while (!node.isRoot()){
-            splay(node);
+    public void splayToRoot(BST node){
+        while (!splay(node)){
+            continue;
         }
     }
-    public void splay(Node node){
+    public boolean splay(BST node){
         if (node.isRoot()){
-            return;
+            return true;
         } else if (node.parentIsRoot()){
             node.rotateUp();
-        } else if (node.isInLine()){
+            return true;
+        }
+		boolean willBeAtRoot = node.parent.parentIsRoot();
+        if (node.isInLine()){
             node.rotateParentUp();
             node.rotateUp();
         } else {
             node.rotateUp();
             node.rotateUp();
         }
+        return willBeAtRoot;
     }
-    public Node[] split(int k){
-        Node node = find(k);
+    public BST[] split(int k){
+        BST node = find(k);
         splayToRoot(node);
-        Node[] pair = {node, node.getRight()};
+        BST[] pair = {node, node.getRight()};
         node.setRight(nullNode);
         return pair;
     }
-    public Node join(SplayTree a, SplayTree b){
-        Node max1 = a;
+    public BST join(SplayTree a, SplayTree b){
+        BST max1 = a;
         while (max1.getRight() != nullNode){
             max1 = max1.getRight();
         }
-        Node min2 = b;
+        BST min2 = b;
         splayToRoot(max1);
         assert (max1.getRight() == nullNode);
         assert(max1.getValue() > b.getValue());

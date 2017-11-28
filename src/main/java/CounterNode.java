@@ -1,4 +1,4 @@
-class CounterNode extends Node{
+class CounterNode extends BST{
     final protected BstCounter bstCounter;
     CounterNode(int value, BstCounter bstCounter){
         super(value);
@@ -14,17 +14,17 @@ class CounterNode extends Node{
         super.rotateUp();
     }
     @Override
-    public Node getLeft(){
+    public BST getLeft(){
         bstCounter.increment();
         return super.getLeft();
     }
     @Override
-    public Node getRight(){
+    public BST getRight(){
         bstCounter.increment();
         return super.getRight();
     }
     @Override
-    public Node getParent(){
+    public BST getParent(){
         bstCounter.increment();
         return super.getParent();
     }

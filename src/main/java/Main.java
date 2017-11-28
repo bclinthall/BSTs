@@ -94,4 +94,12 @@ public class Main{
         java.util.Collections.shuffle(list);
         return list;
     }
+    private static void demonstrateReferenceTree(){
+		BST node = PerfectBSTMaker.makePerfectBST(6);
+		TangoReferenceTree refTree = new TangoReferenceTree(node);
+		refTree.graph("referenceTreeBefore");
+		refTree.find(19);
+		refTree.graph("referenceTreeAfter");
+
+    }
 }

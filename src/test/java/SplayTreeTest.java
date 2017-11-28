@@ -19,7 +19,7 @@ public class SplayTreeTest{
     }
     @Test public void testSplit(){
         SplayTree root = makeTestTree();
-        Node[] pair = root.split(8);
+        BST[] pair = root.split(8);
         assertTrue(pair[0].isValidBST());
         assertTrue(pair[1].isValidBST());
         assertEquals("8:{7:{3:{, 4}, }, }", pair[0].toString());
@@ -28,7 +28,7 @@ public class SplayTreeTest{
     }
     private SplayTree makeTestTree(){
         BstCounter bstCounter = new BstCounter();
-        Node root = new SplayTree(7, bstCounter);
+        BST root = new SplayTree(7, bstCounter);
         root.insert(4);
         root = root.getRootForFree();
         root.insert(3);

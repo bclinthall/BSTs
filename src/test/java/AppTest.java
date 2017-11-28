@@ -6,12 +6,12 @@ import static org.junit.Assert.*;
 
 public class AppTest {
     @Test public void testNodeReadout(){
-        Node seven = new Node(7);
-        seven.setLeft(new Node(4));
-        seven.getLeft().setLeft(new Node(3));
-        seven.setRight(new Node(10));
-        seven.getRight().setLeft(new Node(8));
-        seven.getRight().setRight(new Node(22));
+        BST seven = new BST(7);
+        seven.setLeft(new BST(4));
+        seven.getLeft().setLeft(new BST(3));
+        seven.setRight(new BST(10));
+        seven.getRight().setLeft(new BST(8));
+        seven.getRight().setRight(new BST(22));
         String actual   = seven.toString();
         System.out.println(actual);
         String expected = "7:{4:{3, }, 10:{8, 22}}";
@@ -19,25 +19,25 @@ public class AppTest {
     }
 
     @Test public void testInvalidBST(){
-        Node seven = new Node(7);
-        seven.setLeft(new Node(4));
-        seven.getLeft().setLeft(new Node(3));
-        seven.setRight(new Node(10));
-        seven.getRight().setLeft(new Node(8));
-        seven.getRight().setRight(new Node(9));
+        BST seven = new BST(7);
+        seven.setLeft(new BST(4));
+        seven.getLeft().setLeft(new BST(3));
+        seven.setRight(new BST(10));
+        seven.getRight().setLeft(new BST(8));
+        seven.getRight().setRight(new BST(9));
         assertFalse(seven.isValidBST());
     }
 
     @Test public void testInsert(){
-        Node seven = makeTestTree();
+        BST seven = makeTestTree();
         String actual   = seven.toString();
         System.out.println(actual);
         String expected = "7:{4:{3, }, 10:{8, 22}}";
         assertEquals(expected, actual);
     }
     @Test public void testRotateOnRight(){
-        Node seven = makeTestTree();
-        Node two = new Node(2);
+        BST seven = makeTestTree();
+        BST two = new BST(2);
         two.insert(seven);
         System.out.println(two);
         seven.getRight().rotateUp();
@@ -47,8 +47,8 @@ public class AppTest {
         assertEquals(two.toString(), expected);
     }
 
-    private Node makeTestTree(){
-        Node seven = new Node(7);
+    private BST makeTestTree(){
+        BST seven = new BST(7);
         seven.insert(4);
         seven.insert(3);
         seven.insert(10);
