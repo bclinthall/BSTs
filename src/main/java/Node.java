@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.io.IOException;
 
 class Node{
-    private static Node nullNode = new Node(0);
+    protected static Node nullNode = new Node(0);
     private Node parent = nullNode;
     private Node left = nullNode;
     private Node right = nullNode;
@@ -122,15 +122,15 @@ class Node{
         }
         parent.rotateUp();
     }
-    public Node[] find(int key){
+    public Node find(int key){
         if(key < value && left != nullNode){
             return getLeft().find(key);
         }else if (key > value && right != nullNode){
             return getRight().find(key);
         }else if (value == key){
-            return new Node[]{this, this};
+            return this;
         }else{
-            return new Node[]{null, this};
+            return nullNode;
         }
     }
     public boolean isValidBST(){
@@ -206,6 +206,9 @@ class Node{
         }catch(InterruptedException e){
             e.printStackTrace();
         }
+    }
+    public int getValue(){
+        return value;
     }
 }
 class RootHolder extends Node{
