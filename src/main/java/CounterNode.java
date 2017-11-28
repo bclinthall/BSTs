@@ -28,16 +28,16 @@ class CounterNode extends Node{
         bstCounter.increment();
         return super.getParent();
     }
-    public int getCount(){
+    public long getCount(){
         return bstCounter.getCount();
     }
 }
 class BstCounter{
-    private int count = 0;
+    private long count = 0;
     public void increment(){
         count++;
     }
-    public int getCount(){
+    public long getCount(){
         return count;
     }
 }

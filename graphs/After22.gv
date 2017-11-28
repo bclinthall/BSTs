@@ -1,0 +1,32 @@
+digraph G {
+	node [shape=circle];
+	"52" [label="0"];
+	"52" -> "63";
+	"63" [label="22"];
+	"63" -> "59";
+	"59" [label="10"];
+	"59" -> "53";
+	"53" [label="7"];
+	"53" -> "55";
+	"55" [label="4"];
+	"55" -> "57";
+	"57" [label="3"];
+	"57" -> "57l" [color=gray95];
+	"57l" [shape=point, color=gray95];
+	"57" -> "57r" [color=gray95];
+	"57r" [shape=point, color=gray95];
+	"55" -> "55r" [color=gray95];
+	"55r" [shape=point, color=gray95];
+	"53" -> "61";
+	"61" [label="8"];
+	"61" -> "61l" [color=gray95];
+	"61l" [shape=point, color=gray95];
+	"61" -> "61r" [color=gray95];
+	"61r" [shape=point, color=gray95];
+	"59" -> "59r" [color=gray95];
+	"59r" [shape=point, color=gray95];
+	"63" -> "63r" [color=gray95];
+	"63r" [shape=point, color=gray95];
+	"52" -> "52r" [color=gray95];
+	"52r" [shape=point, color=gray95];
+}

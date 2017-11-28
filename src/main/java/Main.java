@@ -3,11 +3,26 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.Iterator;
-
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.io.IOException;
 
 public class Main{
     public static void main(String[] args){
-        testTrees(1000, 200);
+        List<String> log = new ArrayList<>();
+        log.add("\"type\",\"nodes\",\"accesses\",\"operations\",\"time\"");
+        for (int n = 1000; n < 30000; n+= 1000){
+            testTrees(n, 1000, log);
+            testTrees(n, 1000, log);
+            testTrees(n, 1000, log);
+            testTrees(n, 5000, log);
+            testTrees(n, 10000, log);
+        }
+        try {
+            Files.write(Paths.get("results/log.csv"), log);
+        } catch (IOException e){
+            e.printStackTrace();
+        }
 
         
 
@@ -16,10 +31,10 @@ public class Main{
 //        testSplayTree(10000, 20000);
     }
 
-    private static void testTrees(int treeSize, int maxFreq){
+    private static void testTrees(int treeSize, int maxFreq, List<String> log){
         List<Integer> accesses = randomAccessArray(treeSize, maxFreq);
         List<Integer> keys = shuffledKeyList(treeSize);
-        testSplayTree(accesses, keys);
+        testSplayTree(accesses, keys, log);
     }
     
     private static void testSplayTreeReverseOrder(int treeSize, int accesses){
@@ -40,7 +55,7 @@ public class Main{
         //node.getRootForFree().graph("thousand");
     }
 
-    private static void testSplayTree(List<Integer> accesses, List<Integer> keys){
+    private static void testSplayTree(List<Integer> accesses, List<Integer> keys, List<String> log){
         BstCounter bstCounter = new BstCounter();
         SplayTree node = new SplayTree(keys.get(0), bstCounter);
         long startTime = System.nanoTime();
@@ -51,8 +66,8 @@ public class Main{
             node.getRootForFree().find(accesses.get(i));
         }
         long endTime = System.nanoTime();
+        log.add("\"Splay\"," + keys.size() + "," + accesses.size() + "," + bstCounter.getCount() + "," + (endTime-startTime)/1e9);
         System.out.printf("%9d accesses on a %9d node tree = %12d ops. Time=%f\n", accesses.size(), keys.size(), bstCounter.getCount(), (endTime-startTime)/1e9);
-        node.getRootForFree().graph("hundredRandom");
         if (!node.getRootForFree().isValidBST()){
             throw new IllegalStateException("search resulted in illegal splay tree state");
         }

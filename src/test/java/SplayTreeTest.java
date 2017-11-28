@@ -6,12 +6,12 @@ public class SplayTreeTest{
         SplayTree root = makeTestTree();
         System.out.println(root);
         root.find(7); // +0
-        root = (SplayTree) root.getRootForFree();
-        root.find(3); // +4
+        root =(SplayTree) root.getRootForFree();
+        root.find(22); // +4
         root = (SplayTree) root.getRootForFree();
         root.find(4); // +2
         root = (SplayTree) root.getRootForFree();
-        root.find(22);// +6
+        root.find(3);// +6
         root = (SplayTree) root.getRootForFree();
         assertEquals(12, root.getCount());
         assertEquals(true, root.isValidBST());

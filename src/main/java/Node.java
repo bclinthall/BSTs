@@ -9,13 +9,19 @@ class Node{
     private Node parent = nullNode;
     private Node left = nullNode;
     private Node right = nullNode;
+    private RootHolder rootHolder;
     private int id;
     private static int nodeCount = 0;
     protected final int value;
 
     public Node(int value){
+        this(value, new RootHolder());
+        rootHolder.setRoot(this);
+    }
+    public Node(int value, RootHolder rootHolder){
         this.value = value;
         this.id = nodeCount;
+        this.rootHolder = rootHolder;
         nodeCount++;
     }
     public void detach(){
@@ -54,7 +60,7 @@ class Node{
         return tmp;
     }
     public boolean isRoot(){
-        return parent == nullNode;
+        return parent instanceof RootHolder;
     }
     public boolean parentIsRoot(){
         return parent.isRoot();
@@ -68,9 +74,10 @@ class Node{
             || parent.parent.right == parent && parent.right == this;
     }
     public void insert(int toInsert){
-        insert(new Node(toInsert));
+        insert(new Node(toInsert, rootHolder));
     }
     public void insert(Node toInsert){
+        toInsert.rootHolder = rootHolder;
         if (value < toInsert.value){
             if (right == nullNode){
                 setRight(toInsert);
@@ -147,11 +154,7 @@ class Node{
         return isValid;
     }
     public Node getRootForFree(){
-        if (parent == nullNode){
-            return this;
-        }else{
-            return parent.getRootForFree();
-        }
+        return rootHolder.getRootForFree();
     }
     @Override
     public String toString(){
@@ -205,4 +208,31 @@ class Node{
         }
     }
 }
+class RootHolder extends Node{
+    Node root;
+    public RootHolder(){
+        super(0, null);
+    }
+    public void setRoot(Node node){
+        super.setLeft(node);
+        root = node;
+    }
+    @Override
+    public void setLeft(Node node){
+        setRoot(node);
+    }
+    @Override
+    public void setRight(Node node){
+        setRoot(node);
+    }
+    @Override
+    public void insert(Node node){
 
+        setRoot(node);
+    }
+    @Override
+    public Node getRootForFree(){
+        return root;
+    }
+    
+}
