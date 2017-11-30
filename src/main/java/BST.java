@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Queue;
 import java.util.LinkedList;
 
-class BST {
+class BST implements Tree{
     private RootHolder rootHolder = new RootHolder();
     protected
     BstCounter bstCounter;

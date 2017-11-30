@@ -22,7 +22,12 @@ class PreferredPathGleaner{
 		new PreferredPathGleaner().addPreferredPaths(tree, tree.getRoot(), preferredPaths);
 		preferredPaths.sort(
     		(List<Integer> o1, List<Integer> o2)-> {
-        		return -1 * Integer.compare(o1.size(), o2.size());
+        		int comp = -1 * Integer.compare(o1.size(), o2.size());
+        		if (comp != 0){
+					return comp;
+				}else{
+					return Integer.compare(o1.get(0), o2.get(0));
+        		}
         	});
         return preferredPaths;
 		
@@ -49,25 +54,6 @@ class PreferredPathGleaner{
 	}
 	
 }
-abstract class PreferredPathsTree extends BST{
-	public abstract boolean isOnPreferredPath(Node node);
-    public PreferredPathsTree(){
-        super();
-    }
-    public PreferredPathsTree(BstCounter bstCounter){
-        super(bstCounter);
-    }
-    /*
-     * Makes a perfect BST of size 2^lgN
-     */
-    public PreferredPathsTree(int lgN){
-		super(lgN);
-    }
-    /*
-     * Makes a perfect BST of size 2^lgN
-     */
-    public PreferredPathsTree(int lgN, BstCounter bstCounter){
-        super(lgN, bstCounter);
-    }
-
+interface PreferredPathsTree extends Tree{
+	public boolean isOnPreferredPath(Node node);
 }

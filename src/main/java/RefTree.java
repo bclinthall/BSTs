@@ -1,4 +1,4 @@
-public class RefTree extends PreferredPathsTree{
+public class RefTree extends BST implements PreferredPathsTree{
 	boolean leftPreferred = true;
     public RefTree(){
         super();
@@ -35,11 +35,11 @@ public class RefTree extends PreferredPathsTree{
         Node node = getRoot();
         while (node != Node.nullNode && node.getValue() != key){
             if(key < node.getValue()){
-                node = node.getLeft();
                 setLeftPreferred(node, true);
+                node = node.getLeft();
             }else if (key > node.getValue()){
-                node = node.getRight();
                 setLeftPreferred(node, false);
+                node = node.getRight();
             }
             bstCounter.increment();
         }

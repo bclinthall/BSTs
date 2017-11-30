@@ -1,0 +1,14 @@
+public interface Nodelike{
+	public boolean isLeftChild();
+	public boolean isRightChild();
+	public Nodelike detach();
+	public Nodelike getParent();
+	public Nodelike getLeft();
+	public void setLeft();
+	public Nodelike getRight();
+	public void setRight();
+	public void insert(Nodelike nodeInterface);
+	public boolean isRoot();
+	public boolean isInLine();
+	
+}
