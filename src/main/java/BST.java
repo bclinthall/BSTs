@@ -36,7 +36,7 @@ class BST {
 	 */
     public BST(Node root, BstCounter bstCounter){
         this.bstCounter = bstCounter;
-        rootHolder.insert(augument(root));
+        augmentAndInsert(root);
     }
 
 	/*
@@ -45,14 +45,21 @@ class BST {
 	 * method. Make sure that every node creation gets wrapped in
 	 * this method.
 	 */
-	protected Node augument(Node node){
+	protected Node augment(Node node){
 		return node;
 	}
+    private void augmentAndInsert(Node node){
+        if (node != Node.nullNode){
+    		insert(augment(node));
+    		augmentAndInsert(node.getLeft());
+    		augmentAndInsert(node.getRight());
+        }
+    }
 	public long getOpCount(){
     	return bstCounter.getCount();
 	}
     public void insert(int value){
-        insert(augument(new Node(value)));
+        insert(augment(new Node(value)));
     }
     public void insert(Node node){
         rootHolder.insert(node);
@@ -69,7 +76,7 @@ class BST {
         Node oldParent = node.getParent();
         // grandparent always exists. Is roothold if parent is root.
         Node oldGrandParent = oldParent.getParent();
-        Node oldChild = null;
+        Node oldChild = Node.nullNode;
         if (node.isRightChild()){
             oldChild = node.getLeft().detach();
         } else {
@@ -86,7 +93,7 @@ class BST {
     }
     public Node find(int key){
         Node node = getRoot();
-        while (node != Node.nullNode && node.getValue() != key){
+        while (node != Node.nullNode&& node.getValue() != key){
             if(key < node.getValue()){
                 node = node.getLeft();
             }else if (key > node.getValue()){

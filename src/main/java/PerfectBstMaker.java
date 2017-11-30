@@ -18,6 +18,7 @@ public class PerfectBstMaker{
 	public static void makeChildren(NodeLowHigh nlh, Queue queue){
 		Node node = nlh.node;
 		int val = node.getValue();
+		//System.out.println(val);
 		Node left = new Node((nlh.low + val)/2);
 		node.insert(left);
 		Node right = new Node((val + nlh.high)/2);

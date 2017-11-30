@@ -26,7 +26,7 @@ public class RefTree extends PreferredPathsTree{
         super(bstCounter);
     }
 	@Override
-	protected Node augument(Node node){
+	protected Node augment(Node node){
 		return new RefNode(node.getValue());
 	}
 	private void setLeftPreferred(Node node, boolean leftPreferred){
