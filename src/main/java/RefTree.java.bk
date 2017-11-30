@@ -33,7 +33,7 @@ public class RefTree extends BST implements PreferredPathsTree{
 	@Override
     public Node find(int key){
         Node node = getRoot();
-        while (node != BstNode.nullNode && node.getValue() != key){
+        while (node != Node.nullNode && node.getValue() != key){
             if(key < node.getValue()){
                 setLeftPreferred(node, true);
                 node = node.getLeft();

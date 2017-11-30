@@ -14,18 +14,18 @@ public class NodeTest{
     }
 
     @Test public void testInvalidBST(){
-        Node seven = new BstNode(7);
-        seven.setLeft(new BstNode(4));
-        seven.getLeft().setLeft(new BstNode(3));
-        seven.setRight(new BstNode(10));
-        seven.getRight().setLeft(new BstNode(8));
-        seven.getRight().setRight(new BstNode(9));
+        Node seven = new Node(7);
+        seven.setLeft(new Node(4));
+        seven.getLeft().setLeft(new Node(3));
+        seven.setRight(new Node(10));
+        seven.getRight().setLeft(new Node(8));
+        seven.getRight().setRight(new Node(9));
         assertFalse(seven.isValidBST());
     }
 
     @Test public void testInsert(){
         Node seven = makeTestTree();
-        seven.insert(new BstNode(5));
+        seven.insert(new Node(5));
         String actual   = seven.toString();
         System.out.println(actual);
         String expected = "7:{4:{3, 5}, 10:{8, 22}}";
@@ -45,12 +45,12 @@ public class NodeTest{
     }
 
     private Node makeTestTree(){
-        Node seven = new BstNode(7);
-        seven.insert(new BstNode(4));
-        seven.insert(new BstNode(3));
-        seven.insert(new BstNode(10));
-        seven.insert(new BstNode(8));
-        seven.insert(new BstNode(22));
+        Node seven = new Node(7);
+        seven.insert(new Node(4));
+        seven.insert(new Node(3));
+        seven.insert(new Node(10));
+        seven.insert(new Node(8));
+        seven.insert(new Node(22));
         return seven;
     }
 
