@@ -2,7 +2,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.LinkedList;
-
 /* We want to be able to treat an Auxiliary tree like a Node.
 For the most part, it delegates its node methods to its root.
 But we don't want splayToRoot to travel up to a parent tree.
@@ -25,29 +24,40 @@ class AuxiliaryTree extends SplayTree implements Node{
 
     public AuxiliaryTree(){
         super();
+        id = nodeCount;
+        nodeCount++;
     }
     public AuxiliaryTree(BstCounter bstCounter){
         super(bstCounter);
+        id = nodeCount;
+        nodeCount++;
     }
     /*
      * Makes a perfect BST of size 2^lgN
      */
     public AuxiliaryTree(int lgN){
 		super(lgN);
+        id = nodeCount;
+        nodeCount++;
     }
     /*
      * Makes a perfect BST of size 2^lgN
      */
     public AuxiliaryTree(int lgN, BstCounter bstCounter){
         super(lgN, bstCounter);
+        id = nodeCount;
+        nodeCount++;
     }
 
-	public void setDepth(int depth){
-    	this.depth = depth;
-	}
 	public AuxiliaryTree (RefNode ref, int depth){
-    	super();
-		List<Node> hangersOn = new ArrayList<>();
+		this(ref, new BstCounter(), depth);
+	}
+	public AuxiliaryTree (RefNode ref, BstCounter bstCounter, int depth){
+    	super(bstCounter);
+        id = nodeCount;
+        nodeCount++;
+		this.depth = depth;
+		List<RefNode> hangersOn = new ArrayList<>();
 		List<Integer> hangersOnDepth = new ArrayList<>();
 		boolean cont = true;
 		while(cont){
@@ -55,36 +65,32 @@ class AuxiliaryTree extends SplayTree implements Node{
     		depth++;
     		Node preferredChild = ref.leftPreferred ? ref.getLeft() : ref.getRight();
     		Node dispreferredChild = ref.leftPreferred ? ref.getRight() : ref.getLeft();
-    		if (dispreferredChild != nullNode){
-        		hangersOn.add(dispreferredChild);
+    		if (dispreferredChild != NullNode.get()){
+        		hangersOn.add((RefNode)dispreferredChild);
         		hangersOnDepth.add(depth);
-        		cont = true;
     		}
-    		if (preferredChild != nullNode){
-    			auxTree.insert(new AuxiliaryTree(preferredChild.getValue(), bstCounter, depth));
-    			ref = (RefTree)((RefTree)preferredChild).getRootForFree();
+    		if (preferredChild != NullNode.get()){
+        		AuxNode node = (AuxNode)makeNode(preferredChild.getValue());
+        		node.setDepth(depth);
+				insert(node);
+				ref = (RefNode)preferredChild;
    				cont = true;
     		}
     	}
 		for (int i = 0; i < hangersOn.size(); i++){
-			auxTree.insert(
-    			fromReferenceTree((RefTree)hangersOn.get(i), bstCounter, hangersOnDepth.get(i))
+			insert(
+    			new AuxiliaryTree(hangersOn.get(i), bstCounter, hangersOnDepth.get(i))
 			);
 		}
-		return auxTree;
-	}
-	@Override
-	public boolean isRoot(){
-		return marked || super.isRoot();
 	}
 
-	public boolean isOnPreferredPath(){
-    	return !marked;
+	public boolean isOnPreferredPath(Node node){
+    	return !(node instanceof AuxiliaryTree);
 	}
     @Override
-    protected String getGraphLineLeft(){
-        String line = "\t\"" + id + "\" -> \"" + left.id + "\"";
-        if (((AuxiliaryTree)left).marked){
+    protected String getGraphLineLeft(Node node){
+        String line = "\t\"" + node.getId() + "\" -> \"" + node.getLeft().getId() + "\"";
+        if (!isOnPreferredPath(node.getLeft())){
             line += " [color=gray95];";
         }else{
             line += ";";
@@ -92,9 +98,9 @@ class AuxiliaryTree extends SplayTree implements Node{
         return line;
     }
     @Override
-    protected String getGraphLineRight(){
-		String line = "\t\"" + id + "\" -> \"" + this.right.id + "\"";
-        if (((AuxiliaryTree)right).marked){
+    protected String getGraphLineRight(Node node){
+        String line = "\t\"" + node.getId() + "\" -> \"" + node.getRight().getId() + "\"";
+        if (!isOnPreferredPath(node.getRight())){
             line += " [color=gray95];";
         }else{
             line += ";";
@@ -102,22 +108,7 @@ class AuxiliaryTree extends SplayTree implements Node{
         return line;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //Node interface methods
     public String getId(){
         return "Aux" + id;
     }
@@ -129,12 +120,12 @@ class AuxiliaryTree extends SplayTree implements Node{
     }
     public Node detach(){
         if (isLeftChild()){
-            parent.setLeft(nullNode);
+            parent.setLeft(NullNode.get());
         }
         if(isRightChild()){
-            parent.setRight(nullNode);
+            parent.setRight(NullNode.get());
         }
-        this.parent = nullNode;
+        this.parent = NullNode.get();
         return this;
     }
     public Node getParent(){
@@ -153,10 +144,10 @@ class AuxiliaryTree extends SplayTree implements Node{
         return getRoot().getRight();
     }
     public void setRight(Node right){
-		getRoot.setRight(right);
+		getRoot().setRight(right);
 	}
     public void insert(Node toInsert){
-		getRoot.insert(toInsert);
+		getRoot().insert(toInsert);
 	}
     public boolean isRoot(){
         throw new UnsupportedOperationException("I'm an aux tree, why are you asking if I'm a root?");
@@ -191,4 +182,13 @@ class AuxiliaryTree extends SplayTree implements Node{
         splayToRoot(myMax);
         myMax.insert(toJoin);
     }
+}
+class AuxNode extends BstNode{
+	int depth = 0;
+	public AuxNode(int value){
+    	super(value);
+	}
+	public void setDepth(int depth){
+    	this.depth = depth;
+	}
 }

@@ -75,10 +75,10 @@ public class RefTree extends BST implements PreferredPathsTree{
     		return isLeftPreferred(parent);
 		}
 	}
-    private static class RefNode extends BstNode{
-    	boolean leftPreferred = true;
-    	public RefNode(int value){
-        	super(value);
-    	}
-    }
+}
+class RefNode extends BstNode{
+	boolean leftPreferred = true;
+	public RefNode(int value){
+    	super(value);
+	}
 }
