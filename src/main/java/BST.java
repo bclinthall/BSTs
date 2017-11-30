@@ -61,7 +61,7 @@ class BST implements Tree{
         Node oldParent = node.getParent();
         // grandparent always exists. Is roothold if parent is root.
         Node oldGrandParent = oldParent.getParent();
-        Node oldChild = BstNode.nullNode;
+        Node oldChild = NullNode.get();
         if (node.isRightChild()){
             oldChild = node.getLeft().detach();
         } else {
@@ -78,7 +78,7 @@ class BST implements Tree{
     }
     public Node find(int key){
         Node node = getRoot();
-        while (node != BstNode.nullNode&& node.getValue() != key){
+        while (node != NullNode.get()&& node.getValue() != key){
             if(key < node.getValue()){
                 node = node.getLeft();
             }else if (key > node.getValue()){
@@ -106,14 +106,14 @@ class BST implements Tree{
     }
     public void getGraphLines(List<String> graphLines, Node node){
         graphLines.add("\t\"" + node.getId() + "\" [label=\"" + node.getValue() + "\"];");
-        if (node.getLeft() != BstNode.nullNode){
+        if (node.getLeft() != NullNode.get()){
             graphLines.add(getGraphLineLeft(node));
             getGraphLines(graphLines, node.getLeft());
         } else {
             addNonNode(graphLines, "l", node);
         }
         //addNoneNode(graphLines, "c", node);
-        if (node.getRight() != BstNode.nullNode){
+        if (node.getRight() != NullNode.get()){
             graphLines.add(getGraphLineRight(node));
             getGraphLines(graphLines, node.getRight());
         }else {

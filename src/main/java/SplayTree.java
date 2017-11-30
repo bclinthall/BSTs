@@ -26,7 +26,7 @@ class SplayTree extends BST{
 
 	@Override
 	protected void afterFind(Node found){
-        if (found != BstNode.nullNode){
+        if (found != NullNode.get()){
             splayToRoot(found);
         }
 	}
@@ -68,7 +68,7 @@ class SplayTree extends BST{
      */
     public void join(Node toJoin){
         Node myMax = getRoot();
-        while (myMax.getRight() != BstNode.nullNode){
+        while (myMax.getRight() != NullNode.get()) {
             myMax = myMax.getRight();
         }
         splayToRoot(myMax);

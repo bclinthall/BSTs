@@ -13,5 +13,5 @@ public interface Node{
 	public boolean isInLine();
 	public boolean isValidBST();
 	public int getValue();
-	public int getId();
+	public String getId();
 }

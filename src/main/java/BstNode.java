@@ -2,18 +2,17 @@ class BstNode implements Node{
     protected final int id;
     private static int nodeCount = 0;
     protected final int value;
-    public static NullNode nullNode = new NullNode(0);
-    private Node parent = nullNode;
-    private Node left = nullNode;
-    private Node right = nullNode;
+    private Node parent = NullNode.get();
+    private Node left = NullNode.get();
+    private Node right = NullNode.get();
 
     public BstNode(int value){
         this.value = value;
         this.id = nodeCount;
         nodeCount++;
     }
-    public int getId(){
-        return id;
+    public String getId(){
+        return "Node" + id;
     }
     public boolean isLeftChild(){
         return parent.getLeft() == this;
@@ -23,12 +22,12 @@ class BstNode implements Node{
     }
     public Node detach(){
         if (isLeftChild()){
-            parent.setLeft(nullNode);
+            parent.setLeft(NullNode.get());
         }
         if(isRightChild()){
-            parent.setRight(nullNode);
+            parent.setRight(NullNode.get());
         }
-        this.parent = nullNode;
+        this.parent = NullNode.get();
         return this;
     }
     public Node getParent(){
@@ -53,13 +52,13 @@ class BstNode implements Node{
     }
     public void insert(Node toInsert){
         if (value < toInsert.getValue()){
-            if (right == nullNode){
+            if (right == NullNode.get()){
                 setRight(toInsert);
             }else{
                 right.insert(toInsert);
             }
         } else {
-            if (left == nullNode){
+            if (left == NullNode.get()){
                 setLeft(toInsert);
             } else {
                 left.insert(toInsert);
@@ -80,7 +79,7 @@ class BstNode implements Node{
 
     public boolean isValidBST(){
         boolean isValid = true;
-        if (left != nullNode){
+        if (left != NullNode.get()){
             isValid = value > left.getValue();
             if (!isValid){
                 System.err.printf("%d.left = %d\n", value, left.getValue());
@@ -88,7 +87,7 @@ class BstNode implements Node{
             }
             isValid = left.isValidBST();
         }
-        if (isValid && right != nullNode){
+        if (isValid && right != NullNode.get()){
             isValid = value < right.getValue();
             if (!isValid){
                 System.err.printf("%d.right = %d\n", value, right.getValue());
@@ -100,9 +99,9 @@ class BstNode implements Node{
     }
     @Override
     public String toString(){
-        if (this == nullNode){
+        if (this == NullNode.get()){
             return "";
-        } else if (left == nullNode && right == nullNode){
+        } else if (left == NullNode.get() && right == NullNode.get()){
             return value + "";
         }else{
             return value + ":{"+left + ", " + right + "}";
@@ -153,7 +152,7 @@ class RootHolder extends BstNode{
     }
     @Override
     public void insert(Node node){
-		if (getLeft() == nullNode){
+		if (getLeft() == NullNode.get()){
 			setLeft(node);
 		}else{
     		getLeft().insert(node);
@@ -162,8 +161,12 @@ class RootHolder extends BstNode{
 
 }
 class NullNode extends BstNode{
-    public NullNode(int value){
+	private static NullNode nullNode = new NullNode(0);
+    private NullNode(int value){
         super(value);
+    }
+    public static NullNode get(){
+        return nullNode;
     }
 	@Override
 	public Node detach(){

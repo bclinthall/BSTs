@@ -8,7 +8,7 @@ class PreferredPathGleaner{
     private PreferredPathGleaner(){
     }
 	public void processChildForPreferredPath(PreferredPathsTree tree, Node node){
-        if(node != BstNode.nullNode){
+        if(node != NullNode.get()){
 			if (tree.isOnPreferredPath(node)){
     			queue.add(node);
 			}else{
