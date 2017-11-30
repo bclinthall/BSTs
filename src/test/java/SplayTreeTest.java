@@ -4,12 +4,20 @@ import static org.junit.Assert.*;
 public class SplayTreeTest{
     @Test public void testFindCounter(){
         SplayTree tree = makeTestTree();
+        System.out.println("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{");
         System.out.println(tree);
-        tree.find(7); // +0
-        tree.find(22); // +4
-        tree.find(4); // +2
-        tree.find(3);// +6
-        assertEquals(26, tree.getOpCount());
+        long before = tree.getOpCount();
+        //tree.graph("before7_"+tree.getOpCount());
+        tree.find(7); // +3+3
+        //tree.graph("before22_"+tree.getOpCount());
+        tree.find(22); // +1+1
+        //tree.graph("before4_"+tree.getOpCount());
+        tree.find(4); // +3+3
+        //tree.graph("before3_"+tree.getOpCount());
+        tree.find(3);// +1+1
+        //tree.graph("end_"+tree.getOpCount());
+        System.out.println("}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+        assertEquals(16, tree.getOpCount()-before);
         assertEquals(true, tree.getRoot().isValidBST());
         
     }
@@ -24,6 +32,7 @@ public class SplayTreeTest{
     }
     private SplayTree makeTestTree(){
         SplayTree tree = new SplayTree();
+        tree.insert(7);
         tree.insert(4);
         tree.insert(3);
         tree.insert(10);

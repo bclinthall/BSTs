@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.io.IOException;
+import java.util.Queue;
+import java.util.LinkedList;
 
 class BST {
     private RootHolder rootHolder = new RootHolder();
@@ -10,13 +12,10 @@ class BST {
     BstCounter bstCounter;
 
     public BST(){
-        this(Node.nullNode, new BstCounter());
+        this(new BstCounter());
     }
     public BST(BstCounter bstCounter){
-		this(Node.nullNode, bstCounter);
-    }
-    public BST(Node root){
-		this(root, new BstCounter());
+        this.bstCounter = bstCounter;
     }
     /*
      * Makes a perfect BST of size 2^lgN
@@ -28,38 +27,24 @@ class BST {
      * Makes a perfect BST of size 2^lgN
      */
     public BST(int lgN, BstCounter bstCounter){
-		this(PerfectBstMaker.makePerfectBst(lgN), bstCounter);
+		this(bstCounter);
+		insert(new PerfectBstMaker().makePerfectBst(lgN)); 
     }
-	/*
-	 * This is the main construtor.  All other must
-	 * constructors go through it.
-	 */
-    public BST(Node root, BstCounter bstCounter){
-        this.bstCounter = bstCounter;
-        augmentAndInsert(root);
-    }
-
+	
 	/*
 	 * Does nothing for a generic BST, but some subclasses
 	 * may need special augmented Nodes.  They can override this
 	 * method. Make sure that every node creation gets wrapped in
 	 * this method.
 	 */
-	protected Node augment(Node node){
-		return node;
+	public Node makeNode(int value){
+		return new Node(value);
 	}
-    private void augmentAndInsert(Node node){
-        if (node != Node.nullNode){
-    		insert(augment(node));
-    		augmentAndInsert(node.getLeft());
-    		augmentAndInsert(node.getRight());
-        }
-    }
 	public long getOpCount(){
     	return bstCounter.getCount();
 	}
     public void insert(int value){
-        insert(augment(new Node(value)));
+        insert(makeNode(value));
     }
     public void insert(Node node){
         rootHolder.insert(node);
@@ -160,14 +145,59 @@ class BST {
             e.printStackTrace();
         }
     }
+    class PerfectBstMaker{
+        /*
+         * Returns a node, the root of a perfect BST of size 2^lgN
+         */
+    	public Node makePerfectBst(int lgN){
+    		int n = 1 << lgN;
+    		Queue<NodeLowHigh> queue = new LinkedList<>();
+    		Node node = makeNode(n >> 1);
+    		queue.add(new NodeLowHigh(node, 1, n));
+    		while (!queue.isEmpty()){
+    			makeChildren(queue.remove(), queue);
+    		}
+    		return node;
+    	}
+    	public void makeChildren(NodeLowHigh nlh, Queue queue){
+    		Node node = nlh.node;
+    		int val = node.getValue();
+    		//System.out.println(val);
+    		Node left = makeNode((nlh.low + val)/2);
+    		node.insert(left);
+    		Node right = makeNode((val + nlh.high)/2);
+    		node.insert(right);
+    		if (nlh.high != right.getValue()+1){
+    			queue.add(new NodeLowHigh(left, nlh.low, val));
+    			queue.add(new NodeLowHigh(right, val, nlh.high));
+    		}
+    	}
+    }
+
 }
 
-
+class NodeLowHigh{
+	Node node;
+	int high;
+	int low;
+	NodeLowHigh(Node node, int low, int high){
+    	this.node = node;
+    	this.low = low;
+    	this.high = high;
+	}
+}
 
 class BstCounter{
     private long count = 0;
     public void increment(){
         count++;
+/*        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        System.out.println();
+        System.out.println();
+        for (int i=0; i<4; i++){
+            System.out.println();
+            System.out.print(stack[i]);
+        }*/
     }
     public long getCount(){
         return count;

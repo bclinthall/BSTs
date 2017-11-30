@@ -1,8 +1,8 @@
 class Node{
     protected final int id;
     private static int nodeCount = 0;
-    private final int value;
-    public static Node nullNode = new Node(0);
+    protected final int value;
+    public static Node nullNode = new NullNode(0);
     private Node parent = nullNode;
     private Node left = nullNode;
     private Node right = nullNode;
@@ -157,4 +157,52 @@ class RootHolder extends Node{
 		}
     }
 
+}
+class NullNode extends Node{
+    public NullNode(int value){
+        super(value);
+    }
+	@Override
+	public Node detach(){
+		return this;
+	}
+	@Override
+    public void setLeft(Node node){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to setLeft()");
+    }
+    @Override
+    public void setRight(Node node){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to setRight()");
+    }
+    @Override
+    public Node getRight(){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getRight()");
+    }
+    @Override
+    public Node getLeft(){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getLeft()");
+    }
+    @Override
+    public Node getParent(){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getParent()");
+    }
+    @Override
+    public boolean isRoot(){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't ask me isRoot()");
+    }
+    @Override
+    public boolean isRightChild(){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't ask me isRightChild()");
+    }
+    @Override
+    public boolean isLeftChild(){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't ask me isLeftChild()");
+    }
+    public Node getRoot(){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getRoot()");
+    }
+    @Override
+    public void insert(Node node){
+		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to insert()");
+    }
 }

@@ -14,7 +14,8 @@ public class BstCounterTest{
     }
 
     private BST makeTestTree(){
-        BST seven = new BST(7);
+        BST seven = new BST();
+        seven.insert(7);
         seven.insert(4);
         seven.insert(3);
         seven.insert(10);

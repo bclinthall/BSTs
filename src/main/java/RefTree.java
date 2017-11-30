@@ -6,9 +6,6 @@ public class RefTree extends PreferredPathsTree{
     public RefTree(BstCounter bstCounter){
         super(bstCounter);
     }
-	public RefTree(Node root){
-    	super(root);
-	}
     /*
      * Makes a perfect BST of size 2^lgN
      */
@@ -22,12 +19,9 @@ public class RefTree extends PreferredPathsTree{
         super(lgN, bstCounter);
     }
 
-    public RefTree(Node root, BstCounter bstCounter){
-        super(bstCounter);
-    }
 	@Override
-	protected Node augment(Node node){
-		return new RefNode(node.getValue());
+	public Node makeNode(int value){
+		return new RefNode(value);
 	}
 	private void setLeftPreferred(Node node, boolean leftPreferred){
 		((RefNode)node).leftPreferred = leftPreferred;

@@ -57,12 +57,6 @@ abstract class PreferredPathsTree extends BST{
     public PreferredPathsTree(BstCounter bstCounter){
         super(bstCounter);
     }
-	public PreferredPathsTree(Node root){
-    	super(root);
-	}
-    public PreferredPathsTree(Node root, BstCounter bstCounter){
-        super(bstCounter);
-    }
     /*
      * Makes a perfect BST of size 2^lgN
      */
@@ -75,4 +69,5 @@ abstract class PreferredPathsTree extends BST{
     public PreferredPathsTree(int lgN, BstCounter bstCounter){
         super(lgN, bstCounter);
     }
+
 }

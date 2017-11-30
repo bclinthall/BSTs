@@ -6,12 +6,6 @@ class SplayTree extends BST{
     public SplayTree(BstCounter bstCounter){
         super(bstCounter);
     }
-	public SplayTree(Node root){
-    	super(root);
-	}
-    public SplayTree(Node root, BstCounter bstCounter){
-        super(bstCounter);
-    }
     /*
      * Makes a perfect BST of size 2^lgN
      */
@@ -24,8 +18,7 @@ class SplayTree extends BST{
     public SplayTree(int lgN, BstCounter bstCounter){
         super(lgN, bstCounter);
     }
-	
-    
+
     @Override
 	protected void afterInsert(Node inserted){
 		splayToRoot(inserted);
@@ -46,17 +39,12 @@ class SplayTree extends BST{
     public void splay(Node node){
         if (node.getParent().isRoot()){
             rotateUp(node);
-            bstCounter.increment();
         }else if (node.isInLine()){
             rotateUp(node.getParent());
-            bstCounter.increment();
             rotateUp(node);
-            bstCounter.increment();
         } else {
             rotateUp(node);
-            bstCounter.increment();
             rotateUp(node);
-            bstCounter.increment();
         }
     }
     /*

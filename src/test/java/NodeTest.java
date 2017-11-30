@@ -25,15 +25,16 @@ public class NodeTest{
 
     @Test public void testInsert(){
         Node seven = makeTestTree();
+        seven.insert(new Node(5));
         String actual   = seven.toString();
         System.out.println(actual);
-        seven.insert(new Node(5));
         String expected = "7:{4:{3, 5}, 10:{8, 22}}";
         assertEquals(expected, actual);
     }
     @Test public void testRotateOnRight(){
         Node seven = makeTestTree();
-        BST bst = new BST(new Node(2));
+        BST bst = new BST();
+        bst.insert(bst.makeNode(2));
         bst.insert(seven);
         System.out.println(bst);
         bst.rotateUp(seven.getRight());
