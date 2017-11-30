@@ -3,24 +3,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 class PreferredPathGleaner{
-    Queue<PreferredPathsTree> queue;
+    Queue<Node> queue;
     List<List<Integer>> preferredPaths;
     private PreferredPathGleaner(){
     }
-	public void processChildForPreferredPath(Node node){
-        if(node != BST.nullNode){
-            PreferredPathsTree ppt = (PreferredPathsTree) node;
-			if (ppt.isOnPreferredPath()){
-    			queue.add(ppt);
+	public void processChildForPreferredPath(PreferredPathsTree tree, Node node){
+        if(node != Node.nullNode){
+			if (tree.isOnPreferredPath(node)){
+    			queue.add(node);
 			}else{
-				new PreferredPathGleaner().addPreferredPaths(ppt, preferredPaths);
+				new PreferredPathGleaner().addPreferredPaths(tree, node, preferredPaths);
         	}
         }
     }
     	
-	static public List<List<Integer>> glean(PreferredPathsTree node){
+	static public List<List<Integer>> glean(PreferredPathsTree tree){
 		List<List<Integer>> preferredPaths = new ArrayList<>();
-		new PreferredPathGleaner().addPreferredPaths(node, preferredPaths);
+		new PreferredPathGleaner().addPreferredPaths(tree, tree.getRoot(), preferredPaths);
 		preferredPaths.sort(
     		(List<Integer> o1, List<Integer> o2)-> {
         		return -1 * Integer.compare(o1.size(), o2.size());
@@ -29,7 +28,8 @@ class PreferredPathGleaner{
 		
 	}
 	private void addPreferredPaths(
-    	PreferredPathsTree node,
+    	PreferredPathsTree tree,
+    	Node node,
     	List<List<Integer>> preferredPaths)
     {
         this.preferredPaths = preferredPaths;
@@ -37,18 +37,42 @@ class PreferredPathGleaner{
 		List<Integer> preferredPath = new ArrayList<>();
 		preferredPaths.add(preferredPath);
 		queue.add(node);
-		while (! queue.isEmpty()){
+		while (!queue.isEmpty()){
 			node = queue.remove();
 			preferredPath.add(node.getValue());
 			Node left = node.getLeft();
 			Node right = node.getRight();
-			processChildForPreferredPath(left);
-			processChildForPreferredPath(right);
+			processChildForPreferredPath(tree, left);
+			processChildForPreferredPath(tree, right);
 		}
 		preferredPath.sort(null);
 	}
 	
 }
-interface PreferredPathsTree extends Node{
-	public boolean isOnPreferredPath();
+abstract class PreferredPathsTree extends BST{
+	public abstract boolean isOnPreferredPath(Node node);
+    public PreferredPathsTree(){
+        super();
+    }
+    public PreferredPathsTree(BstCounter bstCounter){
+        super(bstCounter);
+    }
+	public PreferredPathsTree(Node root){
+    	super(root);
+	}
+    public PreferredPathsTree(Node root, BstCounter bstCounter){
+        super(bstCounter);
+    }
+    /*
+     * Makes a perfect BST of size 2^lgN
+     */
+    public PreferredPathsTree(int lgN){
+		super(lgN);
+    }
+    /*
+     * Makes a perfect BST of size 2^lgN
+     */
+    public PreferredPathsTree(int lgN, BstCounter bstCounter){
+        super(lgN, bstCounter);
+    }
 }

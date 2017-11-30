@@ -1,11 +1,14 @@
 import java.util.Queue;
 import java.util.LinkedList;
 
-public class PerfectBSTMaker{
-	public static BST makePerfectBST(int lgN){
+public class PerfectBstMaker{
+    /*
+     * Returns a node, the root of a perfect BST of size 2^lgN
+     */
+	public static Node makePerfectBst(int lgN){
 		int n = 1 << lgN;
 		Queue<NodeLowHigh> queue = new LinkedList<>();
-		BST node = new BST(n >> 1);
+		Node node = new Node(n >> 1);
 		queue.add(new NodeLowHigh(node, 1, n));
 		while (!queue.isEmpty()){
 			makeChildren(queue.remove(), queue);
@@ -13,11 +16,11 @@ public class PerfectBSTMaker{
 		return node;
 	}
 	public static void makeChildren(NodeLowHigh nlh, Queue queue){
-		BST node = nlh.node;
+		Node node = nlh.node;
 		int val = node.getValue();
-		BST left = new BST((nlh.low + val)/2);
+		Node left = new Node((nlh.low + val)/2);
 		node.insert(left);
-		BST right = new BST((val + nlh.high)/2);
+		Node right = new Node((val + nlh.high)/2);
 		node.insert(right);
 		if (nlh.high != right.getValue()+1){
 			queue.add(new NodeLowHigh(left, nlh.low, val));
@@ -27,10 +30,10 @@ public class PerfectBSTMaker{
 }
 
 class NodeLowHigh{
-	BST node;
+	Node node;
 	int high;
 	int low;
-	NodeLowHigh(BST node, int low, int high){
+	NodeLowHigh(Node node, int low, int high){
     	this.node = node;
     	this.low = low;
     	this.high = high;
