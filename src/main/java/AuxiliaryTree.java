@@ -19,6 +19,7 @@ class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
     protected final int id;
     private static int nodeCount = 0;
     int depth = 0;
+    int subtreeMaxDepth = 0;
     int minSubtreeDepth;
     int maxSubtreeDepth;
 	Node parent = NullNode.get();
@@ -110,7 +111,7 @@ class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
 	@Override
 	protected String getNodeLabel(Node node){
 		AuxNode auxNode = (AuxNode)node;
-		return auxNode.getValue() + ":" + auxNode.getDepth();
+		return auxNode.getValue() + ":" + auxNode.getDepth() + ":" + auxNode.getSubtreeMaxDepth();
 	}
     @Override
     public void join(Node toJoin){
@@ -127,9 +128,9 @@ class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
         return new SimpleAuxNode(value);
     }
 
-//	public AuxNode cut(int depth){
-//		
-//	}
+	public AuxNode cut(int depth){
+		return null;
+	}
 
 
 
@@ -143,7 +144,12 @@ class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
     public int getDepth(){
         return depth;
     }
-    public String getId(){
+	public void setSubtreeMaxDepth(int depth){
+    	subtreeMaxDepth = depth;
+	}
+	public int getSubtreeMaxDepth(){
+    	return subtreeMaxDepth;
+	}    public String getId(){
         return "Aux" + id;
     }
     public boolean isLeftChild(){
@@ -211,9 +217,12 @@ class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
 interface AuxNode extends Node{
     public void setDepth(int depth);
     public int getDepth();
+	public void setSubtreeMaxDepth(int depth);
+	public int getSubtreeMaxDepth();
 }
 class SimpleAuxNode extends BstNode implements AuxNode{
     int depth = 0;
+	int subtreeMaxDepth = 0;
 	public SimpleAuxNode(int value){
     	super(value);
 	}
@@ -222,5 +231,11 @@ class SimpleAuxNode extends BstNode implements AuxNode{
 	}
 	public int getDepth(){
     	return depth;
+	}
+	public void setSubtreeMaxDepth(int depth){
+    	subtreeMaxDepth = depth;
+	}
+	public int getSubtreeMaxDepth(){
+    	return subtreeMaxDepth;
 	}
 }
