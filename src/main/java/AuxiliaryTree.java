@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.LinkedList;
+
 /* We want to be able to treat an Auxiliary tree like a Node.
 For the most part, it delegates its node methods to its root.
 But we don't want splayToRoot to travel up to a parent tree.
@@ -13,7 +14,7 @@ calling find or insert. When we join one AuxiliaryTree with another
 we do not want to descend into child trees to find the max.
 That is accomplished by an extra check in the join function below.
 */
-class AuxiliaryTree extends SplayTree implements Node{
+class AuxiliaryTree extends SplayTree implements Node, PreferredPathsTree{
     
     protected final int id;
     private static int nodeCount = 0;
@@ -49,14 +50,17 @@ class AuxiliaryTree extends SplayTree implements Node{
         nodeCount++;
     }
 
-	public AuxiliaryTree (RefNode ref, int depth){
-		this(ref, new BstCounter(), depth);
+	public AuxiliaryTree (RefNode ref){
+		this(ref, new BstCounter(), 0);
 	}
 	public AuxiliaryTree (RefNode ref, BstCounter bstCounter, int depth){
     	super(bstCounter);
         id = nodeCount;
         nodeCount++;
 		this.depth = depth;
+		AuxNode node = (AuxNode)makeNode(ref.getValue());
+		node.setDepth(depth);
+		insert(node);
 		List<RefNode> hangersOn = new ArrayList<>();
 		List<Integer> hangersOnDepth = new ArrayList<>();
 		boolean cont = true;
@@ -70,7 +74,7 @@ class AuxiliaryTree extends SplayTree implements Node{
         		hangersOnDepth.add(depth);
     		}
     		if (preferredChild != NullNode.get()){
-        		AuxNode node = (AuxNode)makeNode(preferredChild.getValue());
+        		node = (AuxNode)makeNode(preferredChild.getValue());
         		node.setDepth(depth);
 				insert(node);
 				ref = (RefNode)preferredChild;
@@ -147,7 +151,7 @@ class AuxiliaryTree extends SplayTree implements Node{
 		getRoot().setRight(right);
 	}
     public void insert(Node toInsert){
-		getRoot().insert(toInsert);
+		rootHolder.insert(toInsert);
 	}
     public boolean isRoot(){
         throw new UnsupportedOperationException("I'm an aux tree, why are you asking if I'm a root?");
@@ -181,6 +185,10 @@ class AuxiliaryTree extends SplayTree implements Node{
         }
         splayToRoot(myMax);
         myMax.insert(toJoin);
+    }
+    @Override
+    public Node makeNode(int value){
+        return new AuxNode(value);
     }
 }
 class AuxNode extends BstNode{

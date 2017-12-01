@@ -1,25 +1,22 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
-
+import java.util.concurrent.ThreadLocalRandom;
 public class AuxiliaryTreeTest{
 	@Test public void constructionTest(){
     	RefTree ref = new RefTree(6);
-    	System.out.println(PreferredPathGleaner.glean(ref));
     	ref.find(19);
+    	String refPaths = PreferredPathGleaner.glean(ref).toString();
 
-//    	AuxiliaryTree aux = AuxiliaryTree.fromReferenceTree(ref, new BstCounter(), 0);
-//    	aux.graph("aux6Before");
-//    	aux.find(18);
-//    	aux = (AuxiliaryTree)aux.getRootForFree();
-//    	aux.graph("aux6After");
+    	AuxiliaryTree aux = new AuxiliaryTree((RefNode)ref.getRoot());
 
-/*    	SplayTree splay = new SplayTree();
-    	splay.insert(32);
-    	splay.insert(16);
-    	splay.insert(8);
-    	splay.insert(4);
-    	splay.insert(2);
-    	splay.insert(1);
-    	splay.graph("splay");*/
-    }
+    	String auxPaths = PreferredPathGleaner.glean(aux).toString();
+    	assertTrue(aux.getRoot().isValidBST());
+    	assertEquals(refPaths, auxPaths);
+
+    	for (int i=0; i<100; i++){
+			ref.find(ThreadLocalRandom.current().nextInt(0, 64));
+    	}
+    	aux = new AuxiliaryTree((RefNode)ref.getRoot());
+    	aux.graph("Tango");
+	}
 }
