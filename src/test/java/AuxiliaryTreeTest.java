@@ -4,10 +4,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AuxiliaryTreeTest{
 	@Test public void constructionTest(){
     	RefTree ref = new RefTree(6);
-    	ref.find(19);
+        //ref.find(19);
     	String refPaths = PreferredPathGleaner.glean(ref).toString();
 
-    	AuxiliaryTree aux = new AuxiliaryTree((RefNode)ref.getRoot());
+    	AuxiliaryTree aux = new AuxiliaryTree(6);
 
     	String auxPaths = PreferredPathGleaner.glean(aux).toString();
     	assertTrue(aux.getRoot().isValidBST());

@@ -14,7 +14,7 @@ calling find or insert. When we join one AuxiliaryTree with another
 we do not want to descend into child trees to find the max.
 That is accomplished by an extra check in the join function below.
 */
-class AuxiliaryTree extends SplayTree implements Node, PreferredPathsTree{
+class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
     
     protected final int id;
     private static int nodeCount = 0;
@@ -37,17 +37,13 @@ class AuxiliaryTree extends SplayTree implements Node, PreferredPathsTree{
      * Makes a perfect BST of size 2^lgN
      */
     public AuxiliaryTree(int lgN){
-		super(lgN);
-        id = nodeCount;
-        nodeCount++;
+		this(lgN, new BstCounter());
     }
     /*
      * Makes a perfect BST of size 2^lgN
      */
     public AuxiliaryTree(int lgN, BstCounter bstCounter){
-        super(lgN, bstCounter);
-        id = nodeCount;
-        nodeCount++;
+        this((RefNode)new RefTree(lgN, bstCounter).getRoot(), bstCounter, 0);
     }
 
 	public AuxiliaryTree (RefNode ref){
@@ -111,8 +107,42 @@ class AuxiliaryTree extends SplayTree implements Node, PreferredPathsTree{
         }
         return line;
     }
+	@Override
+	protected String getNodeLabel(Node node){
+		AuxNode auxNode = (AuxNode)node;
+		return auxNode.getValue() + ":" + auxNode.getDepth();
+	}
+    @Override
+    public void join(Node toJoin){
+        Node myMax = getRoot();
+        while (myMax.getRight() != NullNode.get()
+               && !(myMax.getRight() instanceof AuxiliaryTree)){
+            myMax = myMax.getRight();
+        }
+        splayToRoot(myMax);
+        myMax.insert(toJoin);
+    }
+    @Override
+    public Node makeNode(int value){
+        return new SimpleAuxNode(value);
+    }
+
+//	public AuxNode cut(int depth){
+//		
+//	}
+
+
+
+
+
 
     //Node interface methods
+    public void setDepth(int depth){
+        this.depth = depth;
+    }
+    public int getDepth(){
+        return depth;
+    }
     public String getId(){
         return "Aux" + id;
     }
@@ -177,26 +207,20 @@ class AuxiliaryTree extends SplayTree implements Node, PreferredPathsTree{
      *                the values in /this/ tree. It will be joined
      *                into /this/ tree.
      */
-    @Override
-    public void join(Node toJoin){
-        Node myMax = getRoot();
-        while (myMax.getRight() != NullNode.get() && !(myMax instanceof AuxiliaryTree)){
-            myMax = myMax.getRight();
-        }
-        splayToRoot(myMax);
-        myMax.insert(toJoin);
     }
-    @Override
-    public Node makeNode(int value){
-        return new AuxNode(value);
-    }
+interface AuxNode extends Node{
+    public void setDepth(int depth);
+    public int getDepth();
 }
-class AuxNode extends BstNode{
-	int depth = 0;
-	public AuxNode(int value){
+class SimpleAuxNode extends BstNode implements AuxNode{
+    int depth = 0;
+	public SimpleAuxNode(int value){
     	super(value);
 	}
 	public void setDepth(int depth){
     	this.depth = depth;
+	}
+	public int getDepth(){
+    	return depth;
 	}
 }

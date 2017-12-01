@@ -103,8 +103,11 @@ class BST implements Tree{
     protected String getGraphLineRight(Node node){
 		return "\t\"" + node.getId() + "\" -> \"" + node.getRight().getId() + "\";";
     }
+    protected String getNodeLabel(Node node){
+		return node.getValue() + "";
+    }
     public void getGraphLines(List<String> graphLines, Node node){
-        graphLines.add("\t\"" + node.getId() + "\" [label=\"" + node.getValue() + "\"];");
+        graphLines.add("\t\"" + node.getId() + "\" [label=\"" + getNodeLabel(node) + "\"];");
         if (node.getLeft() != NullNode.get()){
             graphLines.add(getGraphLineLeft(node));
             getGraphLines(graphLines, node.getLeft());
