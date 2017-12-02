@@ -17,6 +17,6 @@ public class AuxiliaryTreeTest{
 			ref.find(ThreadLocalRandom.current().nextInt(0, 64));
     	}
     	aux = new AuxiliaryTree((RefNode)ref.getRoot());
-    	aux.graph("Tango");
+//    	aux.graph("Tango");
 	}
 }

@@ -74,7 +74,11 @@ class BST implements Tree{
         oldParent.insert(oldChild);
         node.insert(oldParent);
         oldGrandParent.insert(node);
+        afterRotateUp(node, oldParent);
     }
+
+    protected void afterRotateUp(Node node, Node oldParent){}
+    
     public Node find(int key){
         Node node = getRoot();
         while (node != NullNode.get()&& node.getValue() != key){

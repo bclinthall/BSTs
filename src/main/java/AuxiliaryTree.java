@@ -14,7 +14,7 @@ calling find or insert. When we join one AuxiliaryTree with another
 we do not want to descend into child trees to find the max.
 That is accomplished by an extra check in the join function below.
 */
-class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
+class AuxiliaryTree extends MaxDepthTree implements AuxNode, PreferredPathsTree{
     
     protected final int id;
     private static int nodeCount = 0;
@@ -85,10 +85,52 @@ class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
 		}
 	}
 
+	private int getMaxSubtreeDepth(Node node){
+		if (node == NullNode.get()){
+    		return 0;
+		}else{
+    		return ((AuxNode)node).getSubtreeMaxDepth();
+		}
+	}
+	private void updateMaxSubtreeDepth(Node node){
+		int d = ((AuxNode)node).getDepth();
+		int dr = getMaxSubtreeDepth(node.getRight());
+		int dl = getMaxSubtreeDepth(node.getLeft());
+		d = dr > d ? dr : d;
+		d = dl > d ? dl : d;
+		((AuxNode)node).setSubtreeMaxDepth(d);
+	}
+	@Override
+	protected void afterRotateUp(Node parent, Node oldParent){
+		updateMaxSubtreeDepth(parent);
+		updateMaxSubtreeDepth(oldParent);
+	}
+
 	public boolean isOnPreferredPath(Node node){
     	return !(node instanceof AuxiliaryTree);
 	}
+
     @Override
+    public void join(Node toJoin){
+        Node myMax = getRoot();
+        while (myMax.getRight() != NullNode.get()
+               && !(myMax.getRight() instanceof AuxiliaryTree)){
+            myMax = myMax.getRight();
+        }
+        splayToRoot(myMax);
+        myMax.insert(toJoin);
+    }
+    @Override
+    public Node makeNode(int value){
+        return new SimpleAuxNode(value);
+    }
+
+	public AuxNode cut(int depth){
+		return null;
+	}
+
+
+	@Override
     protected String getGraphLineLeft(Node node){
         String line = "\t\"" + node.getId() + "\" -> \"" + node.getLeft().getId() + "\"";
         if (!isOnPreferredPath(node.getLeft())){
@@ -112,28 +154,7 @@ class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
 	protected String getNodeLabel(Node node){
 		AuxNode auxNode = (AuxNode)node;
 		return auxNode.getValue() + ":" + auxNode.getDepth() + ":" + auxNode.getSubtreeMaxDepth();
-	}
-    @Override
-    public void join(Node toJoin){
-        Node myMax = getRoot();
-        while (myMax.getRight() != NullNode.get()
-               && !(myMax.getRight() instanceof AuxiliaryTree)){
-            myMax = myMax.getRight();
-        }
-        splayToRoot(myMax);
-        myMax.insert(toJoin);
-    }
-    @Override
-    public Node makeNode(int value){
-        return new SimpleAuxNode(value);
-    }
-
-	public AuxNode cut(int depth){
-		return null;
-	}
-
-
-
+	} 
 
 
 
@@ -237,5 +258,16 @@ class SimpleAuxNode extends BstNode implements AuxNode{
 	}
 	public int getSubtreeMaxDepth(){
     	return subtreeMaxDepth;
+	}
+	public int getSubtreeMaxDepth(Node node){
+		if (node == NullNode.get()){
+    		return 0;
+		}else{
+    		return ((AuxNode)node).getSubtreeMaxDepth();
+		}
+	}
+	@Override
+	protected void afterInsert(Node inserted){
+		setSubtreeMaxDepth(Math.max(subtreeMaxDepth, getSubtreeMaxDepth(inserted)));
 	}
 }

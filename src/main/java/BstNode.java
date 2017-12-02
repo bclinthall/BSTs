@@ -64,6 +64,10 @@ class BstNode implements Node{
                 left.insert(toInsert);
             }
         }
+        afterInsert(toInsert);
+    }
+    protected void afterInsert(Node inserted){
+
     }
     public boolean isRoot(){
         return parent instanceof RootHolder;
