@@ -2,9 +2,9 @@ class BstNode implements Node{
     protected final int id;
     private static int nodeCount = 0;
     protected final int value;
-    private Node parent = NullNode.get();
-    private Node left = NullNode.get();
-    private Node right = NullNode.get();
+    protected Node parent = NullNode.get();
+    protected Node left = NullNode.get();
+    protected Node right = NullNode.get();
 
     public BstNode(int value){
         this.value = value;
@@ -114,6 +114,9 @@ class BstNode implements Node{
     public int getValue(){
         return value;
     }
+    public boolean isNull(){
+        return false;
+    }
 }
 class RootHolder extends BstNode{
     public RootHolder(){
@@ -186,11 +189,13 @@ class NullNode extends BstNode{
     }
     @Override
     public Node getRight(){
-		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getRight()");
+		//throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getRight()");
+		return this;
     }
     @Override
     public Node getLeft(){
-		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getLeft()");
+		return this;
+		//throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to getLeft()");
     }
     @Override
     public Node getParent(){
@@ -214,5 +219,9 @@ class NullNode extends BstNode{
     @Override
     public void insert(Node node){
 		throw new UnsupportedOperationException("I'm the nullNode.  Don't tell me to insert()");
+    }
+    @Override
+    public boolean isNull(){
+        return true;
     }
 }

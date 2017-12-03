@@ -27,7 +27,8 @@ class BST implements Tree{
      */
     public BST(int lgN, BstCounter bstCounter){
 		this(bstCounter);
-		insert(new PerfectBstMaker().makePerfectBst(lgN)); 
+		insert(new PerfectBstMaker().makePerfectBst(lgN));
+		augmentNodes();
     }
 	
 	/*
@@ -39,6 +40,8 @@ class BST implements Tree{
 	public Node makeNode(int value){
 		return new BstNode(value);
 	}
+	public void augmentNodes(){}
+
 	public long getOpCount(){
     	return bstCounter.getCount();
 	}
@@ -50,7 +53,12 @@ class BST implements Tree{
         afterInsert(node);
     }
     protected void afterInsert(Node inserted){}
-    
+
+    public void rotateToRoot(Node node){
+		while(!node.isRoot()){
+    		rotateUp(node);
+		}
+    }
     public void rotateUp(Node node){
         if (node.isRoot()){
             System.err.println("Cannot rotate root with its parent");
@@ -76,7 +84,6 @@ class BST implements Tree{
         oldGrandParent.insert(node);
         afterRotateUp(node, oldParent);
     }
-
     protected void afterRotateUp(Node node, Node oldParent){}
     
     public Node find(int key){
@@ -93,6 +100,13 @@ class BST implements Tree{
         return node;
     }
     protected void afterFind(Node found){}
+
+    public void serve(List<Integer> accessSequence){
+		int size = accessSequence.size();
+		for (int i=0; i<size; i++){
+    		find(accessSequence.get(i));
+		}
+    }		
 
     public Node getRoot(){
         return rootHolder.getRoot();

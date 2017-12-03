@@ -1,0 +1,329 @@
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.LinkedList;
+import java.util.Stack;
+
+/* We want to be able to treat an Auxiliary tree like a Node.
+For the most part, it delegates its node methods to its root.
+But we don't want splayToRoot to travel up to a parent tree.
+This is accomplished because The AuxiliaryTree is not a parent
+the its root. Its root is a genuine root.  So, we cannot traverse
+out of this AuxiliaryTree by calling getParent().  However, we can
+descend into it by call getLeft, or getRight, and by extension by
+calling find or insert. When we join one AuxiliaryTree with another
+we do not want to descend into child trees to find the max.
+That is accomplished by an extra check in the join function below.
+*/
+class AuxiliaryTree extends SplayTree implements AuxNode, PreferredPathsTree{
+    
+    protected final int id;
+    private static int nodeCount = 0;
+    int depth = 0;
+    int subtreeMaxDepth = 0;
+    int minSubtreeDepth;
+    int maxSubtreeDepth;
+	Node parent = NullNode.get();
+
+    public AuxiliaryTree(){
+        super();
+        id = nodeCount;
+        nodeCount++;
+    }
+    public AuxiliaryTree(BstCounter bstCounter){
+        super(bstCounter);
+        id = nodeCount;
+        nodeCount++;
+    }
+    /*
+     * Makes a perfect BST of size 2^lgN
+     */
+    public AuxiliaryTree(int lgN){
+		this(lgN, new BstCounter());
+    }
+    /*
+     * Makes a perfect BST of size 2^lgN
+     */
+    public AuxiliaryTree(int lgN, BstCounter bstCounter){
+        this((RefNode)new RefTree(lgN, bstCounter).getRoot(), bstCounter, 0);
+    }
+
+	public AuxiliaryTree (RefNode ref){
+		this(ref, new BstCounter(), 0);
+	}
+	public AuxiliaryTree (RefNode ref, BstCounter bstCounter, int depth){
+    	super(bstCounter);
+        id = nodeCount;
+        nodeCount++;
+		this.depth = depth;
+		AuxNode node = (AuxNode)makeNode(ref.getValue());
+		node.setDepth(depth);
+		insert(node);
+		List<RefNode> hangersOn = new ArrayList<>();
+		@Override
+		public boolean isNull(){
+    		return true;
+		}
+		List<Integer> hangersOnDepth = new ArrayList<>();
+		boolean cont = true;
+		while(cont){
+    		cont = false;
+    		depth++;
+    		Node preferredChild = ref.leftPreferred ? ref.getLeft() : ref.getRight();
+    		Node dispreferredChild = ref.leftPreferred ? ref.getRight() : ref.getLeft();
+    		if (dispreferredChild != NullNode.get()){
+        		hangersOn.add((RefNode)dispreferredChild);
+        		hangersOnDepth.add(depth);
+    		}
+    		if (preferredChild != NullNode.get()){
+        		node = (AuxNode)makeNode(preferredChild.getValue());
+        		node.setDepth(depth);
+				insert(node);
+				ref = (RefNode)preferredChild;
+   				cont = true;
+    		}
+    	}
+		for (int i = 0; i < hangersOn.size(); i++){
+			insert(
+    			new AuxiliaryTree(hangersOn.get(i), bstCounter, hangersOnDepth.get(i))
+			);
+		}
+	}
+
+	private int getMaxSubtreeDepth(Node node){
+		if (node == NullNode.get()){
+    		return 0;
+		}else{
+    		return ((AuxNode)node).getSubtreeMaxDepth();
+		}
+	}
+	private void updateMaxSubtreeDepth(Node node){
+		int d = ((AuxNode)node).getDepth();
+		int dr = getMaxSubtreeDepth(node.getRight());
+		int dl = getMaxSubtreeDepth(node.getLeft());
+		d = dr > d ? dr : d;
+		d = dl > d ? dl : d;
+		((AuxNode)node).setSubtreeMaxDepth(d);
+	}
+	@Override
+	protected void afterRotateUp(Node parent, Node oldParent){
+		updateMaxSubtreeDepth(parent);
+		updateMaxSubtreeDepth(oldParent);
+	}
+
+	public boolean isOnPreferredPath(Node node){
+    	return !(node instanceof AuxiliaryTree);
+	}
+
+	/*
+	 * Called when we need to cross into a node that is itself an
+	 * auxiliary tree to find a key.  Call it the child tree.
+	 * Let d be the depth of the root node of the child tree.  Then we
+	 * must cut all nodes of depth greater than d out of `this`, package
+	 * them into a new AuxiliaryTree and reinsert them.  Meanwhile, we
+	 * must take all the nodes out of the child tree and insert them into
+	 * `this`.
+	 */	
+	public Node cutAndJoin(int key, AuxiliaryTree child){
+		int d = child.getDepth();
+		AuxiliaryTree newChild = new AuxiliaryTree();
+		//Remove nodes of depth greater than d and package them.
+		newChild.insert(cut(d));
+		//if we called the tree's insert method, it would splay to
+		//root after the insert.  Calling the node's insert method
+		//prevents that.
+		getRoot().insert(newChild); 
+		//Insert nodes from child tree into `this`. 
+		Node node = child.getRoot();
+		getRoot().insert(node);
+		return node;
+	}
+    public Node find(int key){
+        Stack<AuxiliaryTree> stack = new Stack<>();
+        Node node = getRoot();
+        while (node != NullNode.get()
+               && node.getValue() != key
+               && !(node instanceof AuxiliaryTree)){
+            if(key < node.getValue()){
+                node = node.getLeft();
+            }else if (key > node.getValue()){
+                node = node.getRight();
+            }
+            bstCounter.increment();
+        }
+        
+        if (node instanceof AuxiliaryTree){
+			returnNode = findInChildTree(key, (AuxiliaryTree)node);
+        }else{
+            returnNode = node;
+        }
+        splayToRoot(node);
+        return returnNode;
+    }
+    @Override
+    public void join(Node toJoin){
+        Node myMax = getRoot();
+        while (myMax.getRight() != NullNode.get()
+               && !(myMax.getRight() instanceof AuxiliaryTree)){
+            myMax = myMax.getRight();
+        }
+        splayToRoot(myMax);
+        myMax.insert(toJoin);
+    }
+    @Override
+    public Node makeNode(int value){
+        return new SimpleAuxNode(value);
+    }
+
+	public AuxiliaryTree cut(int depth){
+		return null;
+	}
+
+
+	@Override
+    protected String getGraphLineLeft(Node node){
+        String line = "\t\"" + node.getId() + "\" -> \"" + node.getLeft().getId() + "\"";
+        if (!isOnPreferredPath(node.getLeft())){
+            line += " [color=gray95];";
+        }else{
+            line += ";";
+        }
+        return line;
+    }
+    @Override
+    protected String getGraphLineRight(Node node){
+        String line = "\t\"" + node.getId() + "\" -> \"" + node.getRight().getId() + "\"";
+        if (!isOnPreferredPath(node.getRight())){
+            line += " [color=gray95];";
+        }else{
+            line += ";";
+        }
+        return line;
+    }
+	@Override
+	protected String getNodeLabel(Node node){
+		AuxNode auxNode = (AuxNode)node;
+		return auxNode.getValue() + ":" + auxNode.getDepth() + ":" + auxNode.getSubtreeMaxDepth();
+	} 
+
+    //Node interface methods
+    public void setDepth(int depth){
+        this.depth = depth;
+    }
+    public int getDepth(){
+        return depth;
+    }
+	public void setSubtreeMaxDepth(int depth){
+    	subtreeMaxDepth = depth;
+	}
+	public int getSubtreeMaxDepth(){
+    	return subtreeMaxDepth;
+	}
+	public String getId(){
+        return "Aux" + id;
+    }
+	@Override
+	protected void afterInsert(Node inserted){
+		setSubtreeMaxDepth(Math.max(subtreeMaxDepth,
+		                            AuxNode.getSubtreeMaxDepth(inserted)));
+	}
+
+	public boolean isLeftChild(){
+        return parent.getLeft() == this;
+    }
+    public boolean isRightChild(){
+        return parent.getRight() == this;
+    }
+    public Node detach(){
+        if (isLeftChild()){
+            parent.setLeft(NullNode.get());
+        }
+        if(isRightChild()){
+            parent.setRight(NullNode.get());
+        }
+        this.parent = NullNode.get();
+        return this;
+    }
+    public Node getParent(){
+        return parent;
+    }
+    public void setParent(Node parent){
+		this.parent = parent;
+    }
+    public Node getLeft(){
+        return getRoot().getLeft();
+    }
+    public void setLeft(Node left){
+        getRoot().setLeft(left);
+    }
+    public Node getRight(){
+        return getRoot().getRight();
+    }
+    public void setRight(Node right){
+		getRoot().setRight(right);
+	}
+    public void insert(Node toInsert){
+		rootHolder.insert(toInsert);
+	}
+    public boolean isRoot(){
+        throw new UnsupportedOperationException("I'm an aux tree, why are you asking if I'm a root?");
+    }
+    public boolean isInLine(){
+        if(isRoot() || parent.isRoot()){
+            throw new UnsupportedOperationException("It doesn't make sense to "
+                        + "call 'isInLine' on the root or a child of the root.");
+        }
+        return parent.getParent().getLeft() == parent && parent.getLeft() == this
+            || parent.getParent().getRight() == parent && parent.getRight() == this;
+    }
+
+    public boolean isValidBST(){
+        return getRoot().isValidBST();
+    }
+    public int getValue(){
+        return getRoot().getValue();
+    }
+    /*
+     * @param toJoin: a node whose subtree contains only
+     *                nodes whose values are greater than all
+     *                the values in /this/ tree. It will be joined
+     *                into /this/ tree.
+     */
+    }
+interface AuxNode extends Node{
+    public void setDepth(int depth);
+    public int getDepth();
+	public void setSubtreeMaxDepth(int depth);
+	public int getSubtreeMaxDepth();
+	public static int getSubtreeMaxDepth(Node node){
+		if (node == NullNode.get()){
+    		return 0;
+		}else{
+    		return ((AuxNode)node).getSubtreeMaxDepth();
+		}
+	}
+}
+class SimpleAuxNode extends BstNode implements AuxNode{
+    int depth = 0;
+	int subtreeMaxDepth = 0;
+	public SimpleAuxNode(int value){
+    	super(value);
+	}
+	public void setDepth(int depth){
+    	this.depth = depth;
+	}
+	public int getDepth(){
+    	return depth;
+	}
+	public void setSubtreeMaxDepth(int depth){
+    	subtreeMaxDepth = depth;
+	}
+	public int getSubtreeMaxDepth(){
+    	return subtreeMaxDepth;
+	}
+
+	@Override
+	protected void afterInsert(Node inserted){
+		setSubtreeMaxDepth(Math.max(subtreeMaxDepth, AuxNode.getSubtreeMaxDepth(inserted)));
+	}
+}

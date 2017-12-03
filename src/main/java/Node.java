@@ -14,4 +14,5 @@ public interface Node{
 	public boolean isValidBST();
 	public int getValue();
 	public String getId();
+	public boolean isNull();
 }
