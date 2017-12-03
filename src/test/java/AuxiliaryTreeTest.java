@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.List;
 import java.util.ArrayList;
 public class AuxiliaryTreeTest{
-/*    @Test public void find10(){
+    @Test public void find10(){
         findAndCompare(6, 10, false);
     }
     @Test public void find48(){
@@ -25,10 +25,7 @@ public class AuxiliaryTreeTest{
         findAndCompare(6, 63, false);
     }
 	@Test public void constructionTest(){
-		refVsAux(6, 0, false);
-	}
-	@Test public void afterAccessTests(){
-		refVsAux(6, 2, false);
+		refVsAux(6, 0, false, false);
 	}
     private void findAndCompare(int lgN, int toFind,  boolean graph){
 		AuxTree aux = new AuxTree(lgN);
@@ -48,7 +45,7 @@ public class AuxiliaryTreeTest{
 		aux.serve(seq);
 		ref.graph("ref");
 		aux.graph("aux");
-    }*/
+    }
     @Test public void twoAccesses() {
 
 		RefTree ref = new RefTree(6);
@@ -61,7 +58,7 @@ public class AuxiliaryTreeTest{
 		compare(ref, aux, false);
     }
 	@Test public void afterAccessTests(){
-		refVsAux(6, 1, true);
+		refVsAux(8, 10000, true, false);
 	}
 	private List<Integer> generateRandomAccesses(int lgN, int size){
 		int max = 1 << lgN;
@@ -72,17 +69,20 @@ public class AuxiliaryTreeTest{
 		}
 		return accessSequence;
 	}
-	private void refVsAux(int lgN, int accesses, boolean log){
+	private void refVsAux(int lgN, int accesses, boolean log, boolean graph){
     	RefTree ref = new RefTree(lgN);
 		AuxTree aux = new AuxTree(lgN);
 		List<Integer> accessSequence = generateRandomAccesses(lgN, accesses);
-		refVsAux(ref, aux, accessSequence, log);
+		refVsAux(ref, aux, accessSequence, log, graph);
 	}
-	private void refVsAux(RefTree ref, AuxTree aux, List<Integer> accesses, boolean log){
+	private void refVsAux(RefTree ref, AuxTree aux, List<Integer> accesses, boolean log, boolean graph){
     	ref.serve(accesses);
     	aux.serve(accesses);
-    	System.out.println(accesses);
     	compare(ref, aux, log);
+    	if(graph){
+			ref.graph("ref");
+			aux.graph("aux");
+    	}
 	}
 	private void compare(RefTree ref, AuxTree aux, boolean log){
     	List<List<Integer>> refPaths = PreferredPathGleaner.glean(ref);
@@ -94,6 +94,5 @@ public class AuxiliaryTreeTest{
     		}
 		}
 		assertEquals(refPaths, auxPaths);
-
 	}
 }

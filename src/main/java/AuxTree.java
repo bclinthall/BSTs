@@ -157,41 +157,44 @@ public class AuxTree extends SplayTree implements PreferredPathsTree{
     int marksHandled = 0;
 	private void handleMarked(AuxNode node){
     	marksHandled++;
-    	System.out.println("marksHandled: " + marksHandled);
+    	//System.out.println("marksHandled: " + marksHandled);
     	int d = node.getSubtreeMinDepth() - 1;
-    	System.out.printf("+++Key %d is marked at depth %d\n", node.getValue(), d);
-    	boolean g = node.getValue() == 2 && d == 0; //marksHandled == 3;
+    	//System.out.printf("+++Key %d is marked at depth %d\n", node.getValue(), d);
 
-		if(g) graph("0beforeGetRPrime");
 		Node rPrime = getRPrime(d);
-		if(g) graph("1gotRPrime");
 		Node lPrime = getLPrime(d);
-		if(g) graph("2gotLPrime");
 		// Put all nodes with depth greater than d in 
 		// rPrime's left subtree.
 		if (!rPrime.isNull()){
     		rotateToRoot(rPrime);
-    		if(g) graph("3splayedRPrime");
 		}
 		// Put all nodes with depths greater than d in 
 		// lPrime's right subtree.
     	if(!lPrime.isNull()){
 			rotateToRoot(lPrime);
-			if(g) graph("4splayedLPrime");
 		}
 		// Now lPrime is at the root, and rPrime is its right child.
 		// rPrimes left subtree contains all and only nodes with 
 		// depth > d. So, we mark rPrime's left subtree.
+		Node toUpdate;
 		if (rPrime.isNull()){
     		mark(lPrime.getRight());
-    		updateSubtreeDepths(lPrime);
+    		toUpdate = lPrime;
 		}else{
     		mark(rPrime.getLeft());
-    		updateSubtreeDepths(rPrime);
+    		toUpdate = rPrime;
+		}
+		while(!toUpdate.isRoot()){
+			updateSubtreeDepths(toUpdate);
+			toUpdate = toUpdate.getParent();
 		}
 
 		node.unmark();
-		updateSubtreeDepths(node.getParent());
+		toUpdate = node.getParent();
+		while(!toUpdate.isRoot()){
+			updateSubtreeDepths(toUpdate);
+			toUpdate = toUpdate.getParent();
+		}
 	}
 
 	private void mark(Node node){
@@ -271,7 +274,7 @@ public class AuxTree extends SplayTree implements PreferredPathsTree{
     protected String getGraphLineLeft(Node node){
         String line = "\t\"" + node.getId() + "\" -> \"" + node.getLeft().getId() + "\"";
         if (!isOnPreferredPath(node.getLeft())){
-            line += " [color=gray95];";
+            line += " [color=red, lwidth=0.5, style=dotted, arrowhead=empty];";
         }else{
             line += ";";
         }
@@ -281,7 +284,7 @@ public class AuxTree extends SplayTree implements PreferredPathsTree{
     protected String getGraphLineRight(Node node){
         String line = "\t\"" + node.getId() + "\" -> \"" + node.getRight().getId() + "\"";
         if (!isOnPreferredPath(node.getRight())){
-            line += " [color=gray95];";
+            line += " [color=red, lwidth=0.5, style=dotted, arrowhead=empty];";
         }else{
             line += ";";
         }
