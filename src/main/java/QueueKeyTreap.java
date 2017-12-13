@@ -4,26 +4,25 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.IntStream;
 
 public class QueueKeyTreap extends BST{
-    public QueueKeyTreap(int lgN, List<Integer> accessSequence){
+    public QueueKeyTreap(int lgN, IntStream accessSequence){
         this(lgN, new BstCounter(), accessSequence);
     }
-    public QueueKeyTreap(int lgN, BstCounter bstCounter, List<Integer> accessSequence){
+    public QueueKeyTreap(int lgN, BstCounter bstCounter, IntStream accessSequence){
         this.bstCounter = bstCounter;
         int n = 1 << lgN;
         List<QueueKeyTreapNode> nodes = new ArrayList<>(n);
-        int m = accessSequence.size();
         //create all the nodes
         for (int i=0; i<n; i++){
             nodes.add(new QueueKeyTreapNode(i));
         }
         //load them all up with their accesses
-        for (int i=0; i< m; i++){
-            int a = accessSequence.get(i);
-            nodes.get(a).addAccess(i);
-        }
-        QueueKeyTreapNode rootNode = nodes.get(accessSequence.get(0));
+        int[] i = {0};
+        int[] rootKey = {-1};
+        accessSequence.forEachOrdered(a -> {if(i[0]==0)rootKey[0]=a; nodes.get(a).addAccess(i[0]); i[0]++;});
+        QueueKeyTreapNode rootNode = nodes.get(rootKey[0]);
         insert(rootNode);
         makeTreap(rootNode, nodes, 0, rootNode.getValue()-1);
         makeTreap(rootNode, nodes, rootNode.getValue()+1, nodes.size()-1);

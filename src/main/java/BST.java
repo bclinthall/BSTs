@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.LinkedList;
+import java.util.stream.IntStream;
 
 class BST implements Tree{
     protected RootHolder rootHolder = new RootHolder();
@@ -101,12 +102,10 @@ class BST implements Tree{
     }
     protected void afterFind(Node found){}
 
-    public void serve(List<Integer> accessSequence){
-		int size = accessSequence.size();
-		for (int i=0; i<size; i++){
-    		find(accessSequence.get(i));
-		}
-    }		
+    public void serve(IntStream stream){
+        System.out.println("        Beginning to serve sequence");
+		stream.forEachOrdered(x -> find(x));
+    }
 
     public Node getRoot(){
         return rootHolder.getRoot();
