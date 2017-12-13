@@ -58,7 +58,7 @@ public class AuxiliaryTreeTest{
 		compare(ref, aux, false);
     }
 	@Test public void afterAccessTests(){
-		refVsAux(8, 10000, true, false);
+		refVsAux(8, 10000, false, false);
 	}
 	private List<Integer> generateRandomAccesses(int lgN, int size){
 		int max = 1 << lgN;
