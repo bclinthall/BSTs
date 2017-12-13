@@ -6,54 +6,59 @@ import java.util.Iterator;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.io.IOException;
+import java.io.File;
 
 public class Main{
     private static Random rand = new Random(1l);
     public static void main(String[] args){
-        List<String> log = new ArrayList<>();
-        log.add("\"treeType\",\"sequenceType\",\"nodes\",\"accesses\",\"operations\",\"time\"");
-        plainRandomTest(log);
-        try {
-            Files.write(Paths.get("results/log.csv"), log);
-        } catch (IOException e){
-            e.printStackTrace();
-        }
+        plainRandomTest();
     }
-    private static void plainRandomTest(List<String>log){
-		for (int lgN = 10; lgN < 21; lgN++){
+    private static void plainRandomTest(){
+		for (int lgN = 7; lgN < 11; lgN++){
     		int n = 1 << lgN;
 			List<Integer> accesses = plainRandomSequence(n, 10 * n);
-			testTree("Splay", lgN, new SplayTree(lgN), "plainRandom", accesses, log);
-			testTree("Tango", lgN, new AuxTree(lgN), "plainRandom", accesses, log);
+			testTree("Splay", lgN, new SplayTree(lgN), "plainRandom", accesses);
+			testTree("Tango", lgN, new AuxTree(lgN), "plainRandom", accesses);
 		}
     }
 
-    private static void specialRandomTest(List<String> log){
+    private static void specialRandomTest(){
         for (int lgN = 10; lgN < 21; lgN++){
             for (int maxFreq = 1000; maxFreq < 16000; maxFreq*=2){
                 List<Integer> accesses = specialRandomSequence(1 << lgN, maxFreq);
-                testTree("Splay", lgN, new SplayTree(lgN), "specialRandom" + maxFreq, accesses, log);
-                testTree("Tango", lgN, new AuxTree(lgN), "specialRandom" + maxFreq, accesses, log);
+                testTree("Splay", lgN, new SplayTree(lgN), "specialRandom" + maxFreq, accesses);
+                testTree("Tango", lgN, new AuxTree(lgN), "specialRandom" + maxFreq, accesses);
             }
         }
     }
     
-    private static void testTree(String treeType, int lgN, BST tree, String sequenceType, List<Integer> accesses, List<String> log){
+    private static void testTree(String treeType, int lgN, BST tree, String sequenceType, List<Integer> accesses){
         //log.add("\"treeType\",\"sequenceType\",\"nodes\",\"accesses\",\"operations\",\"time\"");
+        String fileName = String.format("results/%s_%s_%d_%d",
+                              treeType,
+                              sequenceType,
+                              1<<lgN,
+                              accesses.size());
+        if (new File(fileName).exists()){
+			System.out.println(fileName + " already exists");
+			return;
+        }
         long startTime = System.nanoTime();
         tree.serve(accesses);
         long endTime = System.nanoTime();
-        log.add(String.format("\"%s\",\"%s\",%d,%d,%d,%.3f",
+        String data = String.format("\"%s\",\"%s\",%d,%d,%d,%.3f",
                               treeType,
                               sequenceType,
                               1<<lgN,
                               accesses.size(),
                               tree.getOpCount(),
-                              (endTime - startTime)/1e9));
-        System.out.printf("%9d accesses on a %9d node %s tree = %12d ops. Time=%.3f\n", accesses.size(), 1 << lgN, treeType, tree.getOpCount(), (endTime-startTime)/1e9);
-        if (!tree.getRoot().isValidBST()){
-            throw new IllegalStateException("search resulted in illegal " + treeType + " tree state");
+                              (endTime - startTime)/1e9);
+        try {
+            Files.write(Paths.get(fileName), data.getBytes());
+        } catch (IOException e){
+            e.printStackTrace();
         }
+        System.out.printf("%9d accesses on a %9d node %s tree = %12d ops. Time=%.3f\n", accesses.size(), 1 << lgN, treeType, tree.getOpCount(), (endTime-startTime)/1e9);
     }
     private static List<Integer> plainRandomSequence(int n, int size){
 		List<Integer> list = new ArrayList(size);

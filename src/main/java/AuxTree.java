@@ -20,33 +20,29 @@ public class AuxTree extends SplayTree implements PreferredPathsTree{
         super(lgN, bstCounter);
         markNodesSetDepths(lgN);
     }
-
+private void markNodesSetDepthsRecursive(AuxNode node, int maxDepth){
+    if(!node.getRight().isNull()){
+    	AuxNode right = (AuxNode)node.getRight();
+    	right.setDepth(node.getDepth()+1);
+    	right.setSubtreeMaxDepth(maxDepth);
+    	right.setSubtreeMinDepth(right.getDepth());
+    	right.mark();
+    	markNodesSetDepthsRecursive(right, maxDepth);
+    }
+    if(!node.getLeft().isNull()){
+    	AuxNode left = (AuxNode)node.getLeft();
+    	left.setDepth(node.getDepth()+1);
+    	left.setSubtreeMaxDepth(maxDepth);
+    	left.setSubtreeMinDepth(left.getDepth());
+    	markNodesSetDepthsRecursive(left, maxDepth);
+    }	
+}
 	private void markNodesSetDepths(int lgN){
 		int maxDepth = lgN - 1;
-		Queue<AuxNode> queue = new LinkedList<>();
 		AuxNode root = (AuxNode)getRoot();
 		root.setDepth(0);
 		root.setSubtreeMaxDepth(maxDepth);
-		queue.add(root);
-		while(!queue.isEmpty()){
-			AuxNode node = queue.remove();
-			if(!node.getRight().isNull()){
-    			AuxNode right = (AuxNode)node.getRight();
-    			right.setDepth(node.getDepth()+1);
-    			right.setSubtreeMaxDepth(maxDepth);
-    			right.setSubtreeMinDepth(right.getDepth());
-    			right.mark();
-    			queue.add(right);
-			}
-			if(!node.getLeft().isNull()){
-    			AuxNode left = (AuxNode)node.getLeft();
-    			left.setDepth(node.getDepth()+1);
-    			left.setSubtreeMaxDepth(maxDepth);
-    			left.setSubtreeMinDepth(left.getDepth());
-    			queue.add(left);
-			}
-
-		}
+		markNodesSetDepthsRecursive(root, maxDepth);
 	}
 	@Override
 	public Node makeNode(int value){

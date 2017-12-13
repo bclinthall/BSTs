@@ -1,23 +1,52 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+
+
+def make_csv():
+    tree_types = ['Splay', 'Tango']
+    files = os.listdir()
+    lines = ['"treeType","sequenceType","nodes","accesses","operations","time"\n']
+    for tree_type in tree_types:
+        for file in files:
+            if file.startswith(tree_type):
+                with open(file, 'r') as fp:
+                    lines.append(fp.read() + '\n')
+    with open("log.csv", "w") as fp:
+        fp.writelines(lines)
+
+make_csv()
 
 df = pd.DataFrame.from_csv("log.csv")
 
+df = df.reset_index()
+df = df.set_index("nodes")
+df = df.sort_index()
+
 df['OpsPerAccess'] = df['operations'] / df['accesses']
-df['perLog'] = df['OpsPerAccess']  / np.log2(df['nodes'])
-df['perLogSq'] = df['perLog']  / np.log2(df['nodes'])
+df['perLog'] = df['OpsPerAccess']  / np.log2(df.index)
+df['perLogLog'] = df['OpsPerAccess']  / np.log2(np.log2(df.index))
 
-df['OpsPerAccess'].plot()
-plt.plot(df['nodes'], df['OpsPerAccess'])
-plt.plot(df['nodes'], 2.89 * np.log2(df['nodes']) - 7)
-graphPerLog(df.nodes, df.OpsPerAccess, 7)
-
+splay = df.loc[df.treeType == "Splay"]
+tango = pd.DataFrame(df.loc[df.treeType == "Tango"])
+tango['overSplay'] = tango['OpsPerAccess'] / splay['OpsPerAccess']
 
 
-plt.plot(df['nodes'], df['perLog'])
-plt.plot(df['nodes'], df['perLogSq'])
+plt.plot(tango.reset_index().OpsPerAccess, "ro")
+plt.plot(splay.reset_index().OpsPerAccess, "bo")
 
+
+
+plt.plot(tango.index, tango.OpsPerAccess)
+plt.plot(splay.index, splay.OpsPerAccess)
+plt.plot(tango.index, tango.perLog)
+plt.plot(splay.index, splay.perLog)
+plt.plot(tango.index, tango.perLogLog)
+plt.plot(splay.index, splay.perLogLog)
+plt.plot(tango.index, tango.overSplay)
+plt.plot(splay.index, splay.time, "ro")
+plt.plot(tango.index, tango.time, "bo")
 
 def graphPerLog(xs, series, constTerm):
     plt.plot(xs, (series + constTerm) / np.log2(xs), label=constTerm)
