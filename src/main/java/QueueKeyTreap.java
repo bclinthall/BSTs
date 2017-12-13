@@ -15,13 +15,20 @@ public class QueueKeyTreap extends BST{
         int n = 1 << lgN;
         List<QueueKeyTreapNode> nodes = new ArrayList<>(n);
         //create all the nodes
+		System.out.println("creating nodes");
         for (int i=0; i<n; i++){
             nodes.add(new QueueKeyTreapNode(i));
         }
         //load them all up with their accesses
+        System.out.println("loading accesses");
         int[] i = {0};
         int[] rootKey = {-1};
-        accessSequence.forEachOrdered(a -> {if(i[0]==0)rootKey[0]=a; nodes.get(a).addAccess(i[0]); i[0]++;});
+        accessSequence.forEachOrdered(a -> {
+                                      if(i[0]==0)rootKey[0]=a;
+                                      nodes.get(a).addAccess(i[0]);
+                                      i[0]++;
+                                   });
+		System.out.println("building tree");
         QueueKeyTreapNode rootNode = nodes.get(rootKey[0]);
         insert(rootNode);
         makeTreap(rootNode, nodes, 0, rootNode.getValue()-1);

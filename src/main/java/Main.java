@@ -12,49 +12,46 @@ public class Main{
     private static Random rand = new Random(1l);
     private static int maxLgN = 21;
     public static void main(String[] args){
-        plainRandomTest();
-        bitReversalTest();
-        sequentialAccessTest();
+        for (int lgN = 7; lgN < maxLgN; lgN++){
+			int n = 1 << lgN;
+            plainRandomTest(lgN, n);
+            bitReversalTest(lgN, n);
+            sequentialAccessTest(lgN,n);
+        }
     }
 
     private static IntStream sequentialStream(int n){
         return IntStream.range(0,n);
     }
-    private static void sequentialAccessTest(){
-        for (int lgN = 7; lgN < maxLgN; lgN++){
-            int n = 1 << lgN;
-            List<Integer> accesses = new ArrayList<>(n);
-			testTree("Splay", lgN, new SplayTree(lgN), "sequential", sequentialStream(n), n);
-			testTree("Tango", lgN, new AuxTree(lgN), "sequential", sequentialStream(n), n);
-			testTree("Treap", lgN, new QueueKeyTreap(lgN, sequentialStream(n)), "sequential", sequentialStream(n), n);
-        }
+    private static void sequentialAccessTest(final int lgN, final int n){
+		testTree("Splay", lgN, () -> new SplayTree(lgN), "sequential", sequentialStream(n), n);
+		testTree("Tango", lgN, () -> new AuxTree(lgN), "sequential", sequentialStream(n), n);
+		if(lgN<=18){
+			testTree("Treap", lgN, () -> new QueueKeyTreap(lgN, sequentialStream(n)), "sequential", sequentialStream(n), n);
+		}
     }
 
     private static IntStream plainRandomStream(int n){
         return new Random(1l).ints(0,n).limit(n*10);
     }
-    private static void plainRandomTest(){
-		for (int lgN = 7; lgN < maxLgN; lgN++){
-    		int n = 1 << lgN;
-			testTree("Splay", lgN, new SplayTree(lgN), "plainRandom", plainRandomStream(n), n*10);
-			testTree("Tango", lgN, new AuxTree(lgN), "plainRandom", plainRandomStream(n), n*10);
-			testTree("Treap", lgN, new QueueKeyTreap(lgN, plainRandomStream(n)), "plainRandom", plainRandomStream(n), n*10);
-		}
+    private static void plainRandomTest(final int lgN, final int n){
+		testTree("Splay", lgN, () -> new SplayTree(lgN), "plainRandom", plainRandomStream(n), n*10);
+		testTree("Tango", lgN, () -> new AuxTree(lgN), "plainRandom", plainRandomStream(n), n*10);
+		testTree("Treap", lgN, () -> new QueueKeyTreap(lgN, plainRandomStream(n)), "plainRandom", plainRandomStream(n), n*10);
     }
     private static IntStream bitReversalStream(int lgN, int n){
 		return IntStream.range(0, n).map(x -> reverseBits(x, lgN));
     }
-    private static void bitReversalTest(){
-        for (int lgN = 7; lgN < maxLgN; lgN++){
-            int n = 1 << lgN;
-            testTree("Splay", lgN, new SplayTree(lgN), "bitReversal", bitReversalStream(lgN, n), n);
-            testTree("Tango", lgN, new AuxTree(lgN), "bitReversal", bitReversalStream(lgN, n), n);
-            testTree("Treap", lgN, new QueueKeyTreap(lgN, bitReversalStream(lgN, n)), "bitReversal", bitReversalStream(lgN, n), n);
-            testTree("Vanilla", lgN, new BST(lgN), "bitReversal", bitReversalStream(lgN, n), n);
+    private static void bitReversalTest(final int lgN, final int n){
+        testTree("Splay", lgN, () -> new SplayTree(lgN), "bitReversal", bitReversalStream(lgN, n), n);
+        testTree("Tango", lgN, () -> new AuxTree(lgN), "bitReversal", bitReversalStream(lgN, n), n);
+        testTree("Vanilla", lgN, () -> new BST(lgN), "bitReversal", bitReversalStream(lgN, n), n);
+        if(lgN < 18){
+            testTree("Treap", lgN, () -> new QueueKeyTreap(lgN, bitReversalStream(lgN, n)), "bitReversal", bitReversalStream(lgN, n), n);
         }
     }
     
-    private static void testTree(String treeType, int lgN, BST tree, String sequenceType, IntStream accesses, int m){
+    private static void testTree(String treeType, int lgN, TreeMaker treeMaker, String sequenceType, IntStream accesses, int m){
         //log.add("\"treeType\",\"sequenceType\",\"nodes\",\"accesses\",\"operations\",\"time\"");
         String fileName = String.format("results/%s_%s_%d_%d",
                               treeType,
@@ -65,6 +62,7 @@ public class Main{
 			System.out.println(fileName + " already exists");
 			return;
         }
+        BST tree = treeMaker.makeTree();
         System.out.println("Beginning test for " + fileName);
         long startTime = System.nanoTime();
         tree.serve(accesses);
@@ -107,4 +105,8 @@ public class Main{
 		refTree.graph("referenceTreeAfter");
 
     }
+}
+@FunctionalInterface
+interface TreeMaker{
+    BST makeTree();
 }
