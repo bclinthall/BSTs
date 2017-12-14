@@ -72,8 +72,10 @@ public class QueueKeyTreap extends BST{
         int key = node.heapKey();
         Node left = node.getLeft();
         Node right = node.getRight();
-        int leftKey = getHeapKey(node.getLeft());
-        int rightKey = getHeapKey(node.getRight());
+        int leftKey = getHeapKey(left);
+        int rightKey = getHeapKey(right);
+        bstCounter.increment();
+        bstCounter.increment();
         while(key > leftKey || key > rightKey){
             if(leftKey < rightKey){
                 rotateUp(left);
@@ -84,6 +86,7 @@ public class QueueKeyTreap extends BST{
                 right = node.getRight();
                 rightKey = getHeapKey(right);
             }
+            bstCounter.increment();
         }
     }
     public int getHeapKey(Node node){

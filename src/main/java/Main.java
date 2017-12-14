@@ -46,9 +46,7 @@ public class Main{
         testTree("Splay", lgN, () -> new SplayTree(lgN), "bitReversal", bitReversalStream(lgN, n), n);
         testTree("Tango", lgN, () -> new AuxTree(lgN), "bitReversal", bitReversalStream(lgN, n), n);
         testTree("Vanilla", lgN, () -> new BST(lgN), "bitReversal", bitReversalStream(lgN, n), n);
-        if(lgN < 18){
-            testTree("Treap", lgN, () -> new QueueKeyTreap(lgN, bitReversalStream(lgN, n)), "bitReversal", bitReversalStream(lgN, n), n);
-        }
+        testTree("Treap", lgN, () -> new QueueKeyTreap(lgN, bitReversalStream(lgN, n)), "bitReversal", bitReversalStream(lgN, n), n);
     }
     
     private static void testTree(String treeType, int lgN, TreeMaker treeMaker, String sequenceType, IntStream accesses, int m){

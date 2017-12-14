@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 
 def make_csv():
-    tree_types = ['Splay', 'Tango', 'Treap']
+    tree_types = ['Splay', 'Tango', 'Treap', 'Vanilla']
     files = os.listdir()
     lines = ['"treeType","sequenceType","nodes","accesses","operations","time"\n']
     for tree_type in tree_types:
@@ -29,8 +29,10 @@ df['perLog'] = df['OpsPerAccess']  / np.log2(df.index)
 df['perLogLog'] = df['OpsPerAccess']  / np.log2(np.log2(df.index))
 
 
-def plot_access_type(access_type):
+def plot_access_type(access_type, maxLgN=25):
+    n = 1 << maxLgN
     access_df = df.loc[df.sequenceType == access_type]
+    access_df = access_df.loc[access_df.index < n]
     splay = access_df.loc[access_df.treeType == "Splay"]
     treap = pd.DataFrame(access_df.loc[access_df.treeType == "Treap"])
     tango = pd.DataFrame(access_df.loc[access_df.treeType == "Tango"])

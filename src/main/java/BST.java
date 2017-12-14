@@ -60,16 +60,19 @@ class BST implements Tree{
     		rotateUp(node);
 		}
     }
+    Node oldParent;
+    Node oldGrandParent;
+    Node oldChild;
     public void rotateUp(Node node){
         if (node.isRoot()){
             System.err.println("Cannot rotate root with its parent");
             return;
         }
         bstCounter.increment();
-        Node oldParent = node.getParent();
-        // grandparent always exists. Is roothold if parent is root.
-        Node oldGrandParent = oldParent.getParent();
-        Node oldChild = NullNode.get();
+        oldParent = node.getParent();
+        // grandparent always exists. Is rootholder if parent is root.
+        oldGrandParent = oldParent.getParent();
+        oldChild = NullNode.get();
         if (node.isRightChild()){
             oldChild = node.getLeft().detach();
         } else {
