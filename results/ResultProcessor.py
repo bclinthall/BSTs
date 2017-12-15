@@ -28,29 +28,41 @@ df['OpsPerAccess'] = df['operations'] / df['accesses']
 df['perLog'] = df['OpsPerAccess']  / np.log2(df.index)
 df['perLogLog'] = df['OpsPerAccess']  / np.log2(np.log2(df.index))
 
+labels = {'Splay':'Splay', 'Tango': 'Tango', 'Treap': 'Treap', 'Vanilla': 'Perfect Static'}
 
-def plot_access_type(access_type, maxLgN=25):
+def plot_access_type(access_type='bitReversal', maxLgN=25, treeTypes=['Splay', 'Vanilla', 'Tango', 'Treap'], plot_what='OpsPerAccess', scale=-1, perloglog=False):
     n = 1 << maxLgN
     access_df = df.loc[df.sequenceType == access_type]
     access_df = access_df.loc[access_df.index < n]
-    splay = access_df.loc[access_df.treeType == "Splay"]
-    treap = pd.DataFrame(access_df.loc[access_df.treeType == "Treap"])
-    tango = pd.DataFrame(access_df.loc[access_df.treeType == "Tango"])
-    tango['overSplay'] = tango['OpsPerAccess'] / splay['OpsPerAccess']
+    tree_dfs = {treeType: pd.DataFrame(pd.DataFrame(access_df.loc[access_df.treeType == treeType])) for treeType in ['Splay', 'Vanilla', 'Tango', 'Treap']}
 
+
+    fig, ax = plt.subplots()
     # plt.plot(tango.reset_index().OpsPerAccess, "ro")
     # plt.plot(splay.reset_index().OpsPerAccess, "bo")
 
-    plt.plot(tango.index, tango.OpsPerAccess)
-    plt.plot(splay.index, splay.OpsPerAccess)
-    plt.plot(treap.index, treap.OpsPerAccess)
-    # plt.plot(tango.index, tango.perLog)
-    # plt.plot(splay.index, splay.perLog)
-    # plt.plot(tango.index, tango.perLogLog)
-    # plt.plot(splay.index, splay.perLogLog)
-    # plt.plot(tango.index, tango.overSplay)
-    # plt.plot(splay.index, splay.time, "ro")
-    # plt.plot(tango.index, tango.time, "bo")
+    for treeType in treeTypes:
+        tree_df = tree_dfs[treeType]
+        ax.plot(tree_df.index, tree_df[plot_what], label=labels[treeType])
+    ax.set_xlabel('nodes')
+    ax.set_ylabel('BST operations per access')
+    if scale != -1:
+        plot_scaled(tree_dfs['Tango'], scale, ax, 'Tango')
+    if perloglog:
+        plot_perloglog(tree_dfs['Tango'], scale, ax, 'Tango')
+    ax.legend()
+
+
+def plot_perloglog(df, scale, ax, tree_type):
+    df['ops_scaled'] = scale * df['OpsPerAccess'] / np.log(np.log(df.index));
+    ax.plot(df.index, df['ops_scaled'], label=tree_type + ' x ' + str(scale) + '/ log log n' )
+
+
+def plot_scaled(df, scale, ax, tree_type, plot_what='OpsPerAccess'):
+    df[plot_what + '_scaled'] = df[plot_what] * scale;
+    ax.plot(df.index, df[plot_what + '_scaled'], label=tree_type + ' x ' + str(scale))
+
+
 
 def graphPerLog(xs, series, constTerm):
     plt.plot(xs, (series + constTerm) / np.log2(xs), label=constTerm)

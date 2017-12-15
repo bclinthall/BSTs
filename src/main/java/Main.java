@@ -12,6 +12,8 @@ public class Main{
     private static Random rand = new Random(1l);
     private static int maxLgN = 21;
     public static void main(String[] args){
+        //refVsAux(18);
+        
         for (int lgN = 7; lgN < maxLgN; lgN++){
 			int n = 1 << lgN;
             plainRandomTest(lgN, n);
@@ -26,6 +28,7 @@ public class Main{
     private static void sequentialAccessTest(final int lgN, final int n){
 		testTree("Splay", lgN, () -> new SplayTree(lgN), "sequential", sequentialStream(n), n);
 		testTree("Tango", lgN, () -> new AuxTree(lgN), "sequential", sequentialStream(n), n);
+        testTree("Vanilla", lgN, () -> new BST(lgN), "sequential", sequentialStream(n), n);
 		if(lgN<=18){
 			testTree("Treap", lgN, () -> new QueueKeyTreap(lgN, sequentialStream(n)), "sequential", sequentialStream(n), n);
 		}
@@ -103,6 +106,19 @@ public class Main{
 		refTree.graph("referenceTreeAfter");
 
     }
+	private static void compare(RefTree ref, AuxTree aux){
+    	List<List<Integer>> refPaths = PreferredPathGleaner.glean(ref);
+		List<List<Integer>> auxPaths = PreferredPathGleaner.glean(aux);
+		System.out.println("+++++++++++ They match: " + refPaths.equals(auxPaths));
+	}
+	private static void refVsAux(int lgN){
+    	RefTree ref = new RefTree(lgN);
+		AuxTree aux = new AuxTree(lgN);
+    	ref.serve(plainRandomStream(1<<lgN));
+    	aux.serve(plainRandomStream(1<<lgN));
+    	compare(ref, aux);
+	}
+
 }
 @FunctionalInterface
 interface TreeMaker{
